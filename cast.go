@@ -174,3 +174,9 @@ func ToDurationSlice(i interface{}) []time.Duration {
 	v, _ := ToDurationSliceE(i)
 	return v
 }
+
+// ToError casts an interface to an error type.
+func ToError(i interface{}) error {
+	v, _ := ToErrorE(i)
+	return v
+}

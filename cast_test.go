@@ -1182,3 +1182,10 @@ func locationEqual(a, b *time.Location) bool {
 
 	return tA.Equal(tB)
 }
+
+func TestError(t *testing.T) {
+	c := qt.New(t)
+
+	c.Assert(ToError(errors.New("foo")).Error(), qt.Equals, "foo")
+	c.Assert(ToError("bar").Error(), qt.Equals, "bar")
+}

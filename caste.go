@@ -1305,3 +1305,14 @@ func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
 		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
 	}
 }
+
+func ToErrorE(i interface{}) (error, error) {
+	switch v := i.(type) {
+	case error:
+		return v, nil
+	case string:
+		return fmt.Errorf("%s", v), nil
+	default:
+		return nil, fmt.Errorf("unable to cast %#v of type %T to error", i, i)
+	}
+}
