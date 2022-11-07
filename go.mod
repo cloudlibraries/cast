@@ -1,4 +1,4 @@
-module github.com/cloudlibraries/cast
+module github.com/golibraries/cast
 
 go 1.18
 
