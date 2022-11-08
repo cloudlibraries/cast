@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	qt "github.com/frankban/quicktest"
+	. "github.com/frankban/quicktest"
 )
 
 type testStep struct {
@@ -77,23 +77,23 @@ func createNumberTestSteps(zero, one, eight, eightnegative, eightpoint31, eightp
 }
 
 // Maybe Go 1.18 generics will make this less ugly?
-func runNumberTest(c *qt.C, tests []testStep, tove func(interface{}) (interface{}, error), tov func(interface{}) interface{}) {
+func runNumberTest(c *C, tests []testStep, tove func(interface{}) (interface{}, error), tov func(interface{}) interface{}) {
 	c.Helper()
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i)
+		errmsg := Commentf("i = %d", i)
 
 		v, err := tove(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 
 		// Non-E test:
 		v = tov(test.input)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 	}
 }
 
@@ -101,7 +101,7 @@ func TestToUintE(t *testing.T) {
 	tests := createNumberTestSteps(uint(0), uint(1), uint(8), uint(0), uint(8), uint(8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToUintE(v) },
 		func(v interface{}) interface{} { return ToUint(v) },
@@ -112,7 +112,7 @@ func TestToUint64E(t *testing.T) {
 	tests := createNumberTestSteps(uint64(0), uint64(1), uint64(8), uint64(0), uint64(8), uint64(8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToUint64E(v) },
 		func(v interface{}) interface{} { return ToUint64(v) },
@@ -123,7 +123,7 @@ func TestToUint32E(t *testing.T) {
 	tests := createNumberTestSteps(uint32(0), uint32(1), uint32(8), uint32(0), uint32(8), uint32(8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToUint32E(v) },
 		func(v interface{}) interface{} { return ToUint32(v) },
@@ -134,7 +134,7 @@ func TestToUint16E(t *testing.T) {
 	tests := createNumberTestSteps(uint16(0), uint16(1), uint16(8), uint16(0), uint16(8), uint16(8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToUint16E(v) },
 		func(v interface{}) interface{} { return ToUint16(v) },
@@ -145,7 +145,7 @@ func TestToUint8E(t *testing.T) {
 	tests := createNumberTestSteps(uint8(0), uint8(1), uint8(8), uint8(0), uint8(8), uint8(8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToUint8E(v) },
 		func(v interface{}) interface{} { return ToUint8(v) },
@@ -155,7 +155,7 @@ func TestToIntE(t *testing.T) {
 	tests := createNumberTestSteps(int(0), int(1), int(8), int(-8), int(8), int(-8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToIntE(v) },
 		func(v interface{}) interface{} { return ToInt(v) },
@@ -166,7 +166,7 @@ func TestToInt64E(t *testing.T) {
 	tests := createNumberTestSteps(int64(0), int64(1), int64(8), int64(-8), int64(8), int64(-8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToInt64E(v) },
 		func(v interface{}) interface{} { return ToInt64(v) },
@@ -177,7 +177,7 @@ func TestToInt32E(t *testing.T) {
 	tests := createNumberTestSteps(int32(0), int32(1), int32(8), int32(-8), int32(8), int32(-8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToInt32E(v) },
 		func(v interface{}) interface{} { return ToInt32(v) },
@@ -188,7 +188,7 @@ func TestToInt16E(t *testing.T) {
 	tests := createNumberTestSteps(int16(0), int16(1), int16(8), int16(-8), int16(8), int16(-8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToInt16E(v) },
 		func(v interface{}) interface{} { return ToInt16(v) },
@@ -199,7 +199,7 @@ func TestToInt8E(t *testing.T) {
 	tests := createNumberTestSteps(int8(0), int8(1), int8(8), int8(-8), int8(8), int8(-8))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToInt8E(v) },
 		func(v interface{}) interface{} { return ToInt8(v) },
@@ -210,7 +210,7 @@ func TestToFloat64E(t *testing.T) {
 	tests := createNumberTestSteps(float64(0), float64(1), float64(8), float64(-8), float64(8.31), float64(-8.31))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToFloat64E(v) },
 		func(v interface{}) interface{} { return ToFloat64(v) },
@@ -221,7 +221,7 @@ func TestToFloat32E(t *testing.T) {
 	tests := createNumberTestSteps(float32(0), float32(1), float32(8), float32(-8), float32(8.31), float32(-8.31))
 
 	runNumberTest(
-		qt.New(t),
+		New(t),
 		tests,
 		func(v interface{}) (interface{}, error) { return ToFloat32E(v) },
 		func(v interface{}) interface{} { return ToFloat32(v) },
@@ -229,7 +229,7 @@ func TestToFloat32E(t *testing.T) {
 }
 
 func TestToStringE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var jn json.Number
 	_ = json.Unmarshal([]byte("8"), &jn)
@@ -272,20 +272,20 @@ func TestToStringE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToString(test.input)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 	}
 }
 
@@ -298,11 +298,11 @@ func (x foo) String() string {
 }
 
 func TestStringerToString(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var x foo
 	x.val = "bar"
-	c.Assert(ToString(x), qt.Equals, "bar")
+	c.Assert(ToString(x), Equals, "bar")
 }
 
 type fu struct {
@@ -314,15 +314,15 @@ func (x fu) Error() string {
 }
 
 func TestErrorToString(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var x fu
 	x.val = "bar"
-	c.Assert(ToString(x), qt.Equals, "bar")
+	c.Assert(ToString(x), Equals, "bar")
 }
 
 func TestStringMapStringSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	// ToStringMapString inputs/outputs
 	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
@@ -381,25 +381,25 @@ func TestStringMapStringSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapStringSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMapStringSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringMapE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -418,25 +418,25 @@ func TestToStringMapE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMap(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringMapBoolE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -455,25 +455,25 @@ func TestToStringMapBoolE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapBoolE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMapBool(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringMapIntE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -495,25 +495,25 @@ func TestToStringMapIntE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapIntE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil, errmsg)
+			c.Assert(err, IsNotNil, errmsg)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil, errmsg)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMapInt(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringMapInt64E(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -536,25 +536,25 @@ func TestToStringMapInt64E(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapInt64E(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMapInt64(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringMapStringE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
 	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
@@ -583,25 +583,25 @@ func TestToStringMapStringE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringMapStringE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringMapString(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToBoolSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -619,25 +619,25 @@ func TestToBoolSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToBoolSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToBoolSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToIntSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -655,25 +655,25 @@ func TestToIntSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToIntSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToIntSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -688,25 +688,25 @@ func TestToSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToStringSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -729,25 +729,25 @@ func TestToStringSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToStringSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToStringSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToDurationSliceE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	tests := []struct {
 		input  interface{}
@@ -766,25 +766,25 @@ func TestToDurationSliceE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToDurationSliceE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToDurationSlice(test.input)
-		c.Assert(v, qt.DeepEquals, test.expect, errmsg)
+		c.Assert(v, DeepEquals, test.expect, errmsg)
 	}
 }
 
 func TestToBoolE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var jf, jt, je json.Number
 	_ = json.Unmarshal([]byte("0"), &jf)
@@ -822,20 +822,20 @@ func TestToBoolE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToBoolE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, Equals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToBool(test.input)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 	}
 }
 
@@ -870,19 +870,19 @@ func BenchmarkTrimZeroDecimal(b *testing.B) {
 }
 
 func TestIndirectPointers(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	x := 13
 	y := &x
 	z := &y
 
-	c.Assert(ToInt(y), qt.Equals, 13)
-	c.Assert(ToInt(z), qt.Equals, 13)
+	c.Assert(ToInt(y), Equals, 13)
+	c.Assert(ToInt(z), Equals, 13)
 
 }
 
 func TestToTime(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var jntime, jnetime json.Number
 	_ = json.Unmarshal([]byte("1234567890"), &jntime)
@@ -934,25 +934,25 @@ func TestToTime(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToTimeE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v.UTC(), qt.Equals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v.UTC(), Equals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToTime(test.input)
-		c.Assert(v.UTC(), qt.Equals, test.expect, errmsg)
+		c.Assert(v.UTC(), Equals, test.expect, errmsg)
 	}
 }
 
 func TestToDurationE(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	var td time.Duration = 5
 	var jn json.Number
@@ -991,34 +991,34 @@ func TestToDurationE(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		errmsg := qt.Commentf("i = %d", i) // assert helper message
+		errmsg := Commentf("i = %d", i) // assert helper message
 
 		v, err := ToDurationE(test.input)
 		if test.iserr {
-			c.Assert(err, qt.IsNotNil)
+			c.Assert(err, IsNotNil)
 			continue
 		}
 
-		c.Assert(err, qt.IsNil)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(err, IsNil)
+		c.Assert(v, Equals, test.expect, errmsg)
 
 		// Non-E test
 		v = ToDuration(test.input)
-		c.Assert(v, qt.Equals, test.expect, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
 	}
 }
 
 func TestToTimeWithTimezones(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
 	est, err := time.LoadLocation("EST")
-	c.Assert(err, qt.IsNil)
+	c.Assert(err, IsNil)
 
 	irn, err := time.LoadLocation("Iran")
-	c.Assert(err, qt.IsNil)
+	c.Assert(err, IsNil)
 
 	swd, err := time.LoadLocation("Europe/Stockholm")
-	c.Assert(err, qt.IsNil)
+	c.Assert(err, IsNil)
 
 	// Test same local time in different timezones
 	utc2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC)
@@ -1040,9 +1040,9 @@ func TestToTimeWithTimezones(t *testing.T) {
 			swd2016str := swd2016.Format(format.format)
 
 			t.Run("without default location", func(t *testing.T) {
-				c := qt.New(t)
+				c := New(t)
 				converted, err := ToTimeE(est2016str)
-				c.Assert(err, qt.IsNil)
+				c.Assert(err, IsNil)
 				if format.hasTimezone() {
 					// Converting inputs with a timezone should preserve it
 					assertTimeEqual(t, est2016, converted)
@@ -1056,9 +1056,9 @@ func TestToTimeWithTimezones(t *testing.T) {
 			})
 
 			t.Run("local timezone without a default location", func(t *testing.T) {
-				c := qt.New(t)
+				c := New(t)
 				converted, err := ToTimeE(swd2016str)
-				c.Assert(err, qt.IsNil)
+				c.Assert(err, IsNil)
 				if format.hasTimezone() {
 					// Converting inputs with a timezone should preserve it
 					assertTimeEqual(t, swd2016, converted)
@@ -1072,10 +1072,10 @@ func TestToTimeWithTimezones(t *testing.T) {
 			})
 
 			t.Run("nil default location", func(t *testing.T) {
-				c := qt.New(t)
+				c := New(t)
 
 				converted, err := ToTimeInDefaultLocationE(est2016str, nil)
-				c.Assert(err, qt.IsNil)
+				c.Assert(err, IsNil)
 				if format.hasTimezone() {
 					// Converting inputs with a timezone should preserve it
 					assertTimeEqual(t, est2016, converted)
@@ -1090,10 +1090,10 @@ func TestToTimeWithTimezones(t *testing.T) {
 			})
 
 			t.Run("default location not UTC", func(t *testing.T) {
-				c := qt.New(t)
+				c := New(t)
 
 				converted, err := ToTimeInDefaultLocationE(est2016str, irn)
-				c.Assert(err, qt.IsNil)
+				c.Assert(err, IsNil)
 				if format.hasTimezone() {
 					// Converting inputs with a timezone should preserve it
 					assertTimeEqual(t, est2016, converted)
@@ -1108,10 +1108,10 @@ func TestToTimeWithTimezones(t *testing.T) {
 			})
 
 			t.Run("time in the local timezone default location not UTC", func(t *testing.T) {
-				c := qt.New(t)
+				c := New(t)
 
 				converted, err := ToTimeInDefaultLocationE(swd2016str, irn)
-				c.Assert(err, qt.IsNil)
+				c.Assert(err, IsNil)
 				if format.hasTimezone() {
 					// Converting inputs with a timezone should preserve it
 					assertTimeEqual(t, swd2016, converted)
@@ -1131,13 +1131,13 @@ func TestToTimeWithTimezones(t *testing.T) {
 }
 
 func TestTrimZeroDecimal(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
-	c.Assert(trimZeroDecimal("10.0"), qt.Equals, "10")
-	c.Assert(trimZeroDecimal("10.00"), qt.Equals, "10")
-	c.Assert(trimZeroDecimal("10.010"), qt.Equals, "10.010")
-	c.Assert(trimZeroDecimal("0.0000000000"), qt.Equals, "0")
-	c.Assert(trimZeroDecimal("0.00000000001"), qt.Equals, "0.00000000001")
+	c.Assert(trimZeroDecimal("10.0"), Equals, "10")
+	c.Assert(trimZeroDecimal("10.00"), Equals, "10")
+	c.Assert(trimZeroDecimal("10.010"), Equals, "10.010")
+	c.Assert(trimZeroDecimal("0.0000000000"), Equals, "0")
+	c.Assert(trimZeroDecimal("0.00000000001"), Equals, "0.00000000001")
 
 }
 
@@ -1145,12 +1145,12 @@ func assertTimeEqual(t *testing.T, expected, actual time.Time) {
 	t.Helper()
 	// Compare the dates using a numeric zone as there are cases where
 	// time.Parse will assign a dummy location.
-	qt.Assert(t, actual.Format(time.RFC1123Z), qt.Equals, expected.Format(time.RFC1123Z))
+	Assert(t, actual.Format(time.RFC1123Z), Equals, expected.Format(time.RFC1123Z))
 }
 
 func assertLocationEqual(t *testing.T, expected, actual *time.Location) {
 	t.Helper()
-	qt.Assert(t, locationEqual(expected, actual), qt.IsTrue)
+	Assert(t, locationEqual(expected, actual), IsTrue)
 }
 
 func locationEqual(a, b *time.Location) bool {
@@ -1184,8 +1184,8 @@ func locationEqual(a, b *time.Location) bool {
 }
 
 func TestError(t *testing.T) {
-	c := qt.New(t)
+	c := New(t)
 
-	c.Assert(ToError(errors.New("foo")).Error(), qt.Equals, "foo")
-	c.Assert(ToError("bar").Error(), qt.Equals, "bar")
+	c.Assert(ToError(errors.New("foo")).Error(), Equals, "foo")
+	c.Assert(ToError("bar").Error(), Equals, "bar")
 }
