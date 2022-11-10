@@ -1191,10 +1191,10 @@ func TestError(t *testing.T) {
 	c.Assert(ToError("bar").Error(), Equals, "bar")
 }
 
-func TestFlattenMap(t *testing.T) {
+func TestFlatten(t *testing.T) {
 	c := New(t)
 
-	c.Assert(flattenMap(map[string]any{
+	c.Assert(flatten(map[string]any{
 		"foo": "bar",
 		"baz": map[string]any{
 			"qux": []interface{}{
@@ -1221,17 +1221,28 @@ func TestFlattenMap(t *testing.T) {
 	c.Assert(gjson.GetBytes(data, "foo").String(), Equals, "bar")
 	c.Assert(gjson.GetBytes(data, "baz.qux.0").String(), Equals, "quux")
 	c.Assert(gjson.GetBytes(data, "baz.qux.1").String(), Equals, "quuz")
-}
 
-func TestFlatStringMap(t *testing.T) {
-	c := New(t)
-	c.Assert(ToFlatStringMap(map[string]any{
-		"foo": "bar",
-		"baz": map[string]any{
-			"qux": "quux",
+	c.Assert(flatten([]any{
+		"foo",
+		"bar",
+		map[string]any{
+			"baz": "qux",
 		},
 	}), DeepEquals, map[string]any{
-		"foo":     "bar",
-		"baz.qux": "quux",
+		"0":     "foo",
+		"1":     "bar",
+		"2.baz": "qux",
 	})
+
+	data, err = json.Marshal([]any{
+		"foo",
+		"bar",
+		map[string]any{
+			"baz": "qux",
+		},
+	})
+	c.Assert(err, IsNil)
+	c.Assert(gjson.GetBytes(data, "0").String(), Equals, "foo")
+	c.Assert(gjson.GetBytes(data, "1").String(), Equals, "bar")
+	c.Assert(gjson.GetBytes(data, "2.baz").String(), Equals, "qux")
 }

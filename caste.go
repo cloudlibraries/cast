@@ -1066,14 +1066,14 @@ func ToStringMapE(i any) (map[string]any, error) {
 	}
 }
 
-func ToFlatStringMapE(i any) (map[string]any, error) {
-	m, err := ToStringMapE(i)
-	if err != nil {
-		return nil, err
-	}
+// func ToFlatStringMapE(i any) (map[string]any, error) {
+// 	m, err := ToStringMapE(i)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return flattenMap(m), nil
-}
+// 	return flattenMap(m), nil
+// }
 
 // ToStringMapIntE casts an interface to a map[string]int{} type.
 func ToStringMapIntE(i any) (map[string]int, error) {
@@ -1172,6 +1172,16 @@ func ToSliceE(i any) ([]any, error) {
 		return s, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
 	}
 }
+
+// // TOFlatSliceE casts an interface to a []any type.
+// func ToFlatSliceE(i any) ([]any, error) {
+// 	s, err := ToSliceE(i)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return flattenSlice(s), nil
+// }
 
 // ToBoolSliceE casts an interface to a []bool type.
 func ToBoolSliceE(i any) ([]bool, error) {

@@ -181,8 +181,8 @@ func ToError(i any) error {
 	return v
 }
 
-// ToFlatStringMap casts an interface to a map[string]any type.
-func ToFlatStringMap(i any) map[string]any {
-	v, _ := ToFlatStringMapE(i)
-	return v
-}
+// // ToFlatStringMap casts an interface to a map[string]any type.
+// func ToFlatStringMap(i any) map[string]any {
+// 	v, _ := ToFlatStringMapE(i)
+// 	return v
+// }
