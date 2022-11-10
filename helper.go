@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -15,7 +16,7 @@ var errNegativeNotAllowed = errors.New("unable to cast negative value")
 // Copyright 2011 The Go Authors. All rights reserved.
 // indirect returns the value, after dereferencing as many times
 // as necessary to reach the base type (or nil).
-func indirect(a interface{}) interface{} {
+func indirect(a any) any {
 	if a == nil {
 		return nil
 	}
@@ -35,7 +36,7 @@ func indirect(a interface{}) interface{} {
 // indirectToStringerOrError returns the value, after dereferencing as many times
 // as necessary to reach the base type (or nil) or an implementation of fmt.Stringer
 // or error,
-func indirectToStringerOrError(a interface{}) interface{} {
+func indirectToStringerOrError(a any) any {
 	if a == nil {
 		return nil
 	}
@@ -154,7 +155,7 @@ func parseDateWith(s string, location *time.Location, formats []timeFormat) (d t
 
 // jsonStringToObject attempts to unmarshall a string as JSON into
 // the object passed as pointer.
-func jsonStringToObject(s string, v interface{}) error {
+func jsonStringToObject(s string, v any) error {
 	data := []byte(s)
 	return json.Unmarshal(data, v)
 }
@@ -162,7 +163,7 @@ func jsonStringToObject(s string, v interface{}) error {
 // toInt returns the int value of v if v or v's underlying type
 // is an int.
 // Note that this will return false for int64 etc. types.
-func toInt(v interface{}) (int, bool) {
+func toInt(v any) (int, bool) {
 	switch v := v.(type) {
 	case int:
 		return v, true
@@ -190,4 +191,35 @@ func trimZeroDecimal(s string) string {
 		}
 	}
 	return s
+}
+
+func flattenAndMergeMap(shadow map[string]any, m map[string]any, prefix string, delimiter string) map[string]any {
+	if shadow != nil && prefix != "" && shadow[prefix] != nil {
+		// prefix is shadowed => nothing more to flatten
+		return shadow
+	}
+	if shadow == nil {
+		shadow = make(map[string]any)
+	}
+
+	var m2 map[string]any
+	if prefix != "" {
+		prefix += delimiter
+	}
+	for k, val := range m {
+		fullKey := prefix + k
+		switch val.(type) {
+		case map[string]any:
+			m2 = val.(map[string]any)
+		case map[any]any:
+			m2 = ToStringMap(val)
+		default:
+			// immediate value
+			shadow[strings.ToLower(fullKey)] = val
+			continue
+		}
+		// recursively merge to shadow map
+		shadow = flattenAndMergeMap(shadow, m2, fullKey, delimiter)
+	}
+	return shadow
 }

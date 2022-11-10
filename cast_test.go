@@ -19,12 +19,12 @@ import (
 )
 
 type testStep struct {
-	input  interface{}
-	expect interface{}
+	input  any
+	expect any
 	iserr  bool
 }
 
-func createNumberTestSteps(zero, one, eight, eightnegative, eightpoint31, eightpoint31negative interface{}) []testStep {
+func createNumberTestSteps(zero, one, eight, eightnegative, eightpoint31, eightpoint31negative any) []testStep {
 	var jeight, jminuseight, jfloateight json.Number
 	_ = json.Unmarshal([]byte("8"), &jeight)
 	_ = json.Unmarshal([]byte("-8"), &jminuseight)
@@ -77,7 +77,7 @@ func createNumberTestSteps(zero, one, eight, eightnegative, eightpoint31, eightp
 }
 
 // Maybe Go 1.18 generics will make this less ugly?
-func runNumberTest(c *C, tests []testStep, tove func(interface{}) (interface{}, error), tov func(interface{}) interface{}) {
+func runNumberTest(c *C, tests []testStep, tove func(any) (any, error), tov func(any) any) {
 	c.Helper()
 
 	for i, test := range tests {
@@ -103,8 +103,8 @@ func TestToUintE(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToUintE(v) },
-		func(v interface{}) interface{} { return ToUint(v) },
+		func(v any) (any, error) { return ToUintE(v) },
+		func(v any) any { return ToUint(v) },
 	)
 }
 
@@ -114,8 +114,8 @@ func TestToUint64E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToUint64E(v) },
-		func(v interface{}) interface{} { return ToUint64(v) },
+		func(v any) (any, error) { return ToUint64E(v) },
+		func(v any) any { return ToUint64(v) },
 	)
 }
 
@@ -125,8 +125,8 @@ func TestToUint32E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToUint32E(v) },
-		func(v interface{}) interface{} { return ToUint32(v) },
+		func(v any) (any, error) { return ToUint32E(v) },
+		func(v any) any { return ToUint32(v) },
 	)
 }
 
@@ -136,8 +136,8 @@ func TestToUint16E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToUint16E(v) },
-		func(v interface{}) interface{} { return ToUint16(v) },
+		func(v any) (any, error) { return ToUint16E(v) },
+		func(v any) any { return ToUint16(v) },
 	)
 }
 
@@ -147,8 +147,8 @@ func TestToUint8E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToUint8E(v) },
-		func(v interface{}) interface{} { return ToUint8(v) },
+		func(v any) (any, error) { return ToUint8E(v) },
+		func(v any) any { return ToUint8(v) },
 	)
 }
 func TestToIntE(t *testing.T) {
@@ -157,8 +157,8 @@ func TestToIntE(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToIntE(v) },
-		func(v interface{}) interface{} { return ToInt(v) },
+		func(v any) (any, error) { return ToIntE(v) },
+		func(v any) any { return ToInt(v) },
 	)
 }
 
@@ -168,8 +168,8 @@ func TestToInt64E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToInt64E(v) },
-		func(v interface{}) interface{} { return ToInt64(v) },
+		func(v any) (any, error) { return ToInt64E(v) },
+		func(v any) any { return ToInt64(v) },
 	)
 }
 
@@ -179,8 +179,8 @@ func TestToInt32E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToInt32E(v) },
-		func(v interface{}) interface{} { return ToInt32(v) },
+		func(v any) (any, error) { return ToInt32E(v) },
+		func(v any) any { return ToInt32(v) },
 	)
 }
 
@@ -190,8 +190,8 @@ func TestToInt16E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToInt16E(v) },
-		func(v interface{}) interface{} { return ToInt16(v) },
+		func(v any) (any, error) { return ToInt16E(v) },
+		func(v any) any { return ToInt16(v) },
 	)
 }
 
@@ -201,8 +201,8 @@ func TestToInt8E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToInt8E(v) },
-		func(v interface{}) interface{} { return ToInt8(v) },
+		func(v any) (any, error) { return ToInt8E(v) },
+		func(v any) any { return ToInt8(v) },
 	)
 }
 
@@ -212,8 +212,8 @@ func TestToFloat64E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToFloat64E(v) },
-		func(v interface{}) interface{} { return ToFloat64(v) },
+		func(v any) (any, error) { return ToFloat64E(v) },
+		func(v any) any { return ToFloat64(v) },
 	)
 }
 
@@ -223,8 +223,8 @@ func TestToFloat32E(t *testing.T) {
 	runNumberTest(
 		New(t),
 		tests,
-		func(v interface{}) (interface{}, error) { return ToFloat32E(v) },
-		func(v interface{}) interface{} { return ToFloat32(v) },
+		func(v any) (any, error) { return ToFloat32E(v) },
+		func(v any) any { return ToFloat32(v) },
 	)
 }
 
@@ -239,7 +239,7 @@ func TestToStringE(t *testing.T) {
 	key := &Key{"foo"}
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect string
 		iserr  bool
 	}{
@@ -326,22 +326,22 @@ func TestStringMapStringSliceE(t *testing.T) {
 
 	// ToStringMapString inputs/outputs
 	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var interfaceMapString = map[interface{}]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var interfaceMapInterface = map[interface{}]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var stringMapInterface = map[string]any{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapString = map[any]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapInterface = map[any]any{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
 
 	// ToStringMapStringSlice inputs/outputs
 	var stringMapStringSlice = map[string][]string{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
-	var stringMapInterfaceSlice = map[string][]interface{}{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
-	var stringMapInterfaceInterfaceSlice = map[string]interface{}{"key 1": []interface{}{"value 1", "value 2", "value 3"}, "key 2": []interface{}{"value 1", "value 2", "value 3"}, "key 3": []interface{}{"value 1", "value 2", "value 3"}}
+	var stringMapInterfaceSlice = map[string][]any{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
+	var stringMapInterfaceInterfaceSlice = map[string]any{"key 1": []any{"value 1", "value 2", "value 3"}, "key 2": []any{"value 1", "value 2", "value 3"}, "key 3": []any{"value 1", "value 2", "value 3"}}
 	var stringMapStringSingleSliceFieldsResult = map[string][]string{"key 1": {"value", "1"}, "key 2": {"value", "2"}, "key 3": {"value", "3"}}
-	var interfaceMapStringSlice = map[interface{}][]string{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
-	var interfaceMapInterfaceSlice = map[interface{}][]interface{}{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
+	var interfaceMapStringSlice = map[any][]string{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
+	var interfaceMapInterfaceSlice = map[any][]any{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
 
 	var stringMapStringSliceMultiple = map[string][]string{"key 1": {"value 1", "value 2", "value 3"}, "key 2": {"value 1", "value 2", "value 3"}, "key 3": {"value 1", "value 2", "value 3"}}
 	var stringMapStringSliceSingle = map[string][]string{"key 1": {"value 1"}, "key 2": {"value 2"}, "key 3": {"value 3"}}
 
-	var stringMapInterface1 = map[string]interface{}{"key 1": []string{"value 1"}, "key 2": []string{"value 2"}}
+	var stringMapInterface1 = map[string]any{"key 1": []string{"value 1"}, "key 2": []string{"value 2"}}
 	var stringMapInterfaceResult1 = map[string][]string{"key 1": {"value 1"}, "key 2": {"value 2"}}
 
 	var jsonStringMapString = `{"key 1": "value 1", "key 2": "value 2"}`
@@ -353,7 +353,7 @@ func TestStringMapStringSliceE(t *testing.T) {
 	}
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect map[string][]string
 		iserr  bool
 	}{
@@ -374,8 +374,8 @@ func TestStringMapStringSliceE(t *testing.T) {
 		// errors
 		{nil, nil, true},
 		{testing.T{}, nil, true},
-		{map[interface{}]interface{}{"foo": testing.T{}}, nil, true},
-		{map[interface{}]interface{}{Key{"foo"}: "bar"}, nil, true}, // ToStringE(Key{"foo"}) should fail
+		{map[any]any{"foo": testing.T{}}, nil, true},
+		{map[any]any{Key{"foo"}: "bar"}, nil, true}, // ToStringE(Key{"foo"}) should fail
 		{jsonStringMapString, nil, true},
 		{"", nil, true},
 	}
@@ -402,14 +402,14 @@ func TestToStringMapE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
-		expect map[string]interface{}
+		input  any
+		expect map[string]any
 		iserr  bool
 	}{
-		{map[interface{}]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
-		{map[string]interface{}{"tag": "tags", "group": "groups"}, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
-		{`{"tag": "tags", "group": "groups"}`, map[string]interface{}{"tag": "tags", "group": "groups"}, false},
-		{`{"tag": "tags", "group": true}`, map[string]interface{}{"tag": "tags", "group": true}, false},
+		{map[any]any{"tag": "tags", "group": "groups"}, map[string]any{"tag": "tags", "group": "groups"}, false},
+		{map[string]any{"tag": "tags", "group": "groups"}, map[string]any{"tag": "tags", "group": "groups"}, false},
+		{`{"tag": "tags", "group": "groups"}`, map[string]any{"tag": "tags", "group": "groups"}, false},
+		{`{"tag": "tags", "group": true}`, map[string]any{"tag": "tags", "group": true}, false},
 
 		// errors
 		{nil, nil, true},
@@ -439,12 +439,12 @@ func TestToStringMapBoolE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect map[string]bool
 		iserr  bool
 	}{
-		{map[interface{}]interface{}{"v1": true, "v2": false}, map[string]bool{"v1": true, "v2": false}, false},
-		{map[string]interface{}{"v1": true, "v2": false}, map[string]bool{"v1": true, "v2": false}, false},
+		{map[any]any{"v1": true, "v2": false}, map[string]bool{"v1": true, "v2": false}, false},
+		{map[string]any{"v1": true, "v2": false}, map[string]bool{"v1": true, "v2": false}, false},
 		{map[string]bool{"v1": true, "v2": false}, map[string]bool{"v1": true, "v2": false}, false},
 		{`{"v1": true, "v2": false}`, map[string]bool{"v1": true, "v2": false}, false},
 
@@ -476,12 +476,12 @@ func TestToStringMapIntE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect map[string]int
 		iserr  bool
 	}{
-		{map[interface{}]interface{}{"v1": 1, "v2": 222}, map[string]int{"v1": 1, "v2": 222}, false},
-		{map[string]interface{}{"v1": 342, "v2": 5141}, map[string]int{"v1": 342, "v2": 5141}, false},
+		{map[any]any{"v1": 1, "v2": 222}, map[string]int{"v1": 1, "v2": 222}, false},
+		{map[string]any{"v1": 342, "v2": 5141}, map[string]int{"v1": 342, "v2": 5141}, false},
 		{map[string]int{"v1": 33, "v2": 88}, map[string]int{"v1": 33, "v2": 88}, false},
 		{map[string]int32{"v1": int32(33), "v2": int32(88)}, map[string]int{"v1": 33, "v2": 88}, false},
 		{map[string]uint16{"v1": uint16(33), "v2": uint16(88)}, map[string]int{"v1": 33, "v2": 88}, false},
@@ -516,12 +516,12 @@ func TestToStringMapInt64E(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect map[string]int64
 		iserr  bool
 	}{
-		{map[interface{}]interface{}{"v1": int32(8), "v2": int32(888)}, map[string]int64{"v1": int64(8), "v2": int64(888)}, false},
-		{map[string]interface{}{"v1": int64(45), "v2": int64(67)}, map[string]int64{"v1": 45, "v2": 67}, false},
+		{map[any]any{"v1": int32(8), "v2": int32(888)}, map[string]int64{"v1": int64(8), "v2": int64(888)}, false},
+		{map[string]any{"v1": int64(45), "v2": int64(67)}, map[string]int64{"v1": 45, "v2": 67}, false},
 		{map[string]int64{"v1": 33, "v2": 88}, map[string]int64{"v1": 33, "v2": 88}, false},
 		{map[string]int{"v1": 33, "v2": 88}, map[string]int64{"v1": 33, "v2": 88}, false},
 		{map[string]int32{"v1": int32(33), "v2": int32(88)}, map[string]int64{"v1": 33, "v2": 88}, false},
@@ -557,15 +557,15 @@ func TestToStringMapStringE(t *testing.T) {
 	c := New(t)
 
 	var stringMapString = map[string]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var stringMapInterface = map[string]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var interfaceMapString = map[interface{}]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
-	var interfaceMapInterface = map[interface{}]interface{}{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var stringMapInterface = map[string]any{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapString = map[any]string{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
+	var interfaceMapInterface = map[any]any{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}
 	var jsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"}`
 	var invalidJsonString = `{"key 1": "value 1", "key 2": "value 2", "key 3": "value 3"`
 	var emptyString = ""
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect map[string]string
 		iserr  bool
 	}{
@@ -604,12 +604,12 @@ func TestToBoolSliceE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect []bool
 		iserr  bool
 	}{
 		{[]bool{true, false, true}, []bool{true, false, true}, false},
-		{[]interface{}{true, false, true}, []bool{true, false, true}, false},
+		{[]any{true, false, true}, []bool{true, false, true}, false},
 		{[]int{1, 0, 1}, []bool{true, false, true}, false},
 		{[]string{"true", "false", "true"}, []bool{true, false, true}, false},
 		// errors
@@ -640,12 +640,12 @@ func TestToIntSliceE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect []int
 		iserr  bool
 	}{
 		{[]int{1, 3}, []int{1, 3}, false},
-		{[]interface{}{1.2, 3.2}, []int{1, 3}, false},
+		{[]any{1.2, 3.2}, []int{1, 3}, false},
 		{[]string{"2", "3"}, []int{2, 3}, false},
 		{[2]string{"2", "3"}, []int{2, 3}, false},
 		// errors
@@ -676,12 +676,12 @@ func TestToSliceE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
-		expect []interface{}
+		input  any
+		expect []any
 		iserr  bool
 	}{
-		{[]interface{}{1, 3}, []interface{}{1, 3}, false},
-		{[]map[string]interface{}{{"k1": 1}, {"k2": 2}}, []interface{}{map[string]interface{}{"k1": 1}, map[string]interface{}{"k2": 2}}, false},
+		{[]any{1, 3}, []any{1, 3}, false},
+		{[]map[string]any{{"k1": 1}, {"k2": 2}}, []any{map[string]any{"k1": 1}, map[string]any{"k2": 2}}, false},
 		// errors
 		{nil, nil, true},
 		{testing.T{}, nil, true},
@@ -709,7 +709,7 @@ func TestToStringSliceE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect []string
 		iserr  bool
 	}{
@@ -720,8 +720,8 @@ func TestToStringSliceE(t *testing.T) {
 		{[]float32{float32(1.01), float32(2.01)}, []string{"1.01", "2.01"}, false},
 		{[]float64{float64(1.01), float64(2.01)}, []string{"1.01", "2.01"}, false},
 		{[]string{"a", "b"}, []string{"a", "b"}, false},
-		{[]interface{}{1, 3}, []string{"1", "3"}, false},
-		{interface{}(1), []string{"1"}, false},
+		{[]any{1, 3}, []string{"1", "3"}, false},
+		{any(1), []string{"1"}, false},
 		{[]error{errors.New("a"), errors.New("b")}, []string{"a", "b"}, false},
 		// errors
 		{nil, nil, true},
@@ -750,13 +750,13 @@ func TestToDurationSliceE(t *testing.T) {
 	c := New(t)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect []time.Duration
 		iserr  bool
 	}{
 		{[]string{"1s", "1m"}, []time.Duration{time.Second, time.Minute}, false},
 		{[]int{1, 2}, []time.Duration{1, 2}, false},
-		{[]interface{}{1, 3}, []time.Duration{1, 3}, false},
+		{[]any{1, 3}, []time.Duration{1, 3}, false},
 		{[]time.Duration{1, 3}, []time.Duration{1, 3}, false},
 
 		// errors
@@ -791,7 +791,7 @@ func TestToBoolE(t *testing.T) {
 	_ = json.Unmarshal([]byte("1"), &jt)
 	_ = json.Unmarshal([]byte("1.0"), &je)
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect bool
 		iserr  bool
 	}{
@@ -848,7 +848,7 @@ func BenchmarkTooBool(b *testing.B) {
 }
 
 func BenchmarkTooInt(b *testing.B) {
-	convert := func(num52 interface{}) {
+	convert := func(num52 any) {
 		if v := ToInt(num52); v != 52 {
 			b.Fatalf("ToInt returned wrong value, got %d, want %d", v, 32)
 		}
@@ -888,7 +888,7 @@ func TestToTime(t *testing.T) {
 	_ = json.Unmarshal([]byte("1234567890"), &jntime)
 	_ = json.Unmarshal([]byte("123.4567890"), &jnetime)
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect time.Time
 		iserr  bool
 	}{
@@ -959,7 +959,7 @@ func TestToDurationE(t *testing.T) {
 	_ = json.Unmarshal([]byte("5"), &jn)
 
 	tests := []struct {
-		input  interface{}
+		input  any
 		expect time.Duration
 		iserr  bool
 	}{
@@ -1188,4 +1188,31 @@ func TestError(t *testing.T) {
 
 	c.Assert(ToError(errors.New("foo")).Error(), Equals, "foo")
 	c.Assert(ToError("bar").Error(), Equals, "bar")
+}
+
+func TestFlatStringMap(t *testing.T) {
+	c := New(t)
+	c.Assert(ToFlatStringMap(map[string]interface{}{
+		"foo": "bar",
+		"baz": map[string]interface{}{
+			"qux": "quux",
+		},
+	}), DeepEquals, map[string]interface{}{
+		"foo":     "bar",
+		"baz.qux": "quux",
+	})
+
+	type Baz struct {
+		Qux string `json:"qux"`
+	}
+
+	type Foo struct {
+		Foo string `structs:"foo"`
+		Baz Baz    `structs:"baz"`
+	}
+
+	c.Assert(ToFlatStringMap(&Foo{"bar", Baz{"quux"}}), DeepEquals, map[string]interface{}{
+		"foo":     "bar",
+		"baz.qux": "quux",
+	})
 }

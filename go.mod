@@ -2,7 +2,10 @@ module github.com/golibraries/cast
 
 go 1.19
 
-require github.com/frankban/quicktest v1.14.3
+require (
+	github.com/fatih/structs v1.1.0
+	github.com/frankban/quicktest v1.14.3
+)
 
 require (
 	github.com/google/go-cmp v0.5.9 // indirect

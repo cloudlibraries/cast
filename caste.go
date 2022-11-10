@@ -13,17 +13,19 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/fatih/structs"
 )
 
 // ToTimeE casts an interface to a time.Time type.
-func ToTimeE(i interface{}) (tim time.Time, err error) {
+func ToTimeE(i any) (tim time.Time, err error) {
 	return ToTimeInDefaultLocationE(i, time.UTC)
 }
 
 // ToTimeInDefaultLocationE casts an empty interface to time.Time,
 // interpreting inputs without a timezone to be in the given location,
 // or the local timezone if nil.
-func ToTimeInDefaultLocationE(i interface{}, location *time.Location) (tim time.Time, err error) {
+func ToTimeInDefaultLocationE(i any, location *time.Location) (tim time.Time, err error) {
 	i = indirect(i)
 
 	switch v := i.(type) {
@@ -55,7 +57,7 @@ func ToTimeInDefaultLocationE(i interface{}, location *time.Location) (tim time.
 }
 
 // ToDurationE casts an interface to a time.Duration type.
-func ToDurationE(i interface{}) (d time.Duration, err error) {
+func ToDurationE(i any) (d time.Duration, err error) {
 	i = indirect(i)
 
 	switch s := i.(type) {
@@ -86,7 +88,7 @@ func ToDurationE(i interface{}) (d time.Duration, err error) {
 }
 
 // ToBoolE casts an interface to a bool type.
-func ToBoolE(i interface{}) (bool, error) {
+func ToBoolE(i any) (bool, error) {
 	i = indirect(i)
 
 	switch b := i.(type) {
@@ -113,7 +115,7 @@ func ToBoolE(i interface{}) (bool, error) {
 }
 
 // ToFloat64E casts an interface to a float64 type.
-func ToFloat64E(i interface{}) (float64, error) {
+func ToFloat64E(i any) (float64, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -169,7 +171,7 @@ func ToFloat64E(i interface{}) (float64, error) {
 }
 
 // ToFloat32E casts an interface to a float32 type.
-func ToFloat32E(i interface{}) (float32, error) {
+func ToFloat32E(i any) (float32, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -225,7 +227,7 @@ func ToFloat32E(i interface{}) (float32, error) {
 }
 
 // ToInt64E casts an interface to an int64 type.
-func ToInt64E(i interface{}) (int64, error) {
+func ToInt64E(i any) (int64, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -277,7 +279,7 @@ func ToInt64E(i interface{}) (int64, error) {
 }
 
 // ToInt32E casts an interface to an int32 type.
-func ToInt32E(i interface{}) (int32, error) {
+func ToInt32E(i any) (int32, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -329,7 +331,7 @@ func ToInt32E(i interface{}) (int32, error) {
 }
 
 // ToInt16E casts an interface to an int16 type.
-func ToInt16E(i interface{}) (int16, error) {
+func ToInt16E(i any) (int16, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -381,7 +383,7 @@ func ToInt16E(i interface{}) (int16, error) {
 }
 
 // ToInt8E casts an interface to an int8 type.
-func ToInt8E(i interface{}) (int8, error) {
+func ToInt8E(i any) (int8, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -433,7 +435,7 @@ func ToInt8E(i interface{}) (int8, error) {
 }
 
 // ToIntE casts an interface to an int type.
-func ToIntE(i interface{}) (int, error) {
+func ToIntE(i any) (int, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -485,7 +487,7 @@ func ToIntE(i interface{}) (int, error) {
 }
 
 // ToUintE casts an interface to a uint type.
-func ToUintE(i interface{}) (uint, error) {
+func ToUintE(i any) (uint, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -561,7 +563,7 @@ func ToUintE(i interface{}) (uint, error) {
 }
 
 // ToUint64E casts an interface to a uint64 type.
-func ToUint64E(i interface{}) (uint64, error) {
+func ToUint64E(i any) (uint64, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -637,7 +639,7 @@ func ToUint64E(i interface{}) (uint64, error) {
 }
 
 // ToUint32E casts an interface to a uint32 type.
-func ToUint32E(i interface{}) (uint32, error) {
+func ToUint32E(i any) (uint32, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -713,7 +715,7 @@ func ToUint32E(i interface{}) (uint32, error) {
 }
 
 // ToUint16E casts an interface to a uint16 type.
-func ToUint16E(i interface{}) (uint16, error) {
+func ToUint16E(i any) (uint16, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -789,7 +791,7 @@ func ToUint16E(i interface{}) (uint16, error) {
 }
 
 // ToUint8E casts an interface to a uint type.
-func ToUint8E(i interface{}) (uint8, error) {
+func ToUint8E(i any) (uint8, error) {
 	i = indirect(i)
 
 	intv, ok := toInt(i)
@@ -865,7 +867,7 @@ func ToUint8E(i interface{}) (uint8, error) {
 }
 
 // ToStringE casts an interface to a string type.
-func ToStringE(i interface{}) (string, error) {
+func ToStringE(i any) (string, error) {
 	i = indirectToStringerOrError(i)
 
 	switch s := i.(type) {
@@ -923,23 +925,23 @@ func ToStringE(i interface{}) (string, error) {
 }
 
 // ToStringMapStringE casts an interface to a map[string]string type.
-func ToStringMapStringE(i interface{}) (map[string]string, error) {
+func ToStringMapStringE(i any) (map[string]string, error) {
 	var m = map[string]string{}
 
 	switch v := i.(type) {
 	case map[string]string:
 		return v, nil
-	case map[string]interface{}:
+	case map[string]any:
 		for k, val := range v {
 			m[ToString(k)] = ToString(val)
 		}
 		return m, nil
-	case map[interface{}]string:
+	case map[any]string:
 		for k, val := range v {
 			m[ToString(k)] = ToString(val)
 		}
 		return m, nil
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			m[ToString(k)] = ToString(val)
 		}
@@ -953,13 +955,13 @@ func ToStringMapStringE(i interface{}) (map[string]string, error) {
 }
 
 // ToStringMapStringSliceE casts an interface to a map[string][]string type.
-func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
+func ToStringMapStringSliceE(i any) (map[string][]string, error) {
 	var m = map[string][]string{}
 
 	switch v := i.(type) {
 	case map[string][]string:
 		return v, nil
-	case map[string][]interface{}:
+	case map[string][]any:
 		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
 		}
@@ -968,10 +970,10 @@ func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
 		for k, val := range v {
 			m[ToString(k)] = []string{val}
 		}
-	case map[string]interface{}:
+	case map[string]any:
 		for k, val := range v {
 			switch vt := val.(type) {
-			case []interface{}:
+			case []any:
 				m[ToString(k)] = ToStringSlice(vt)
 			case []string:
 				m[ToString(k)] = vt
@@ -980,22 +982,22 @@ func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
 			}
 		}
 		return m, nil
-	case map[interface{}][]string:
+	case map[any][]string:
 		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
 		}
 		return m, nil
-	case map[interface{}]string:
+	case map[any]string:
 		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
 		}
 		return m, nil
-	case map[interface{}][]interface{}:
+	case map[any][]any:
 		for k, val := range v {
 			m[ToString(k)] = ToStringSlice(val)
 		}
 		return m, nil
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			key, err := ToStringE(k)
 			if err != nil {
@@ -1017,16 +1019,16 @@ func ToStringMapStringSliceE(i interface{}) (map[string][]string, error) {
 }
 
 // ToStringMapBoolE casts an interface to a map[string]bool type.
-func ToStringMapBoolE(i interface{}) (map[string]bool, error) {
+func ToStringMapBoolE(i any) (map[string]bool, error) {
 	var m = map[string]bool{}
 
 	switch v := i.(type) {
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			m[ToString(k)] = ToBool(val)
 		}
 		return m, nil
-	case map[string]interface{}:
+	case map[string]any:
 		for k, val := range v {
 			m[ToString(k)] = ToBool(val)
 		}
@@ -1041,40 +1043,58 @@ func ToStringMapBoolE(i interface{}) (map[string]bool, error) {
 	}
 }
 
-// ToStringMapE casts an interface to a map[string]interface{} type.
-func ToStringMapE(i interface{}) (map[string]interface{}, error) {
-	var m = map[string]interface{}{}
+// ToStringMapE casts an interface to a map[string]any type.
+func ToStringMapE(i any) (map[string]any, error) {
+	var m = map[string]any{}
 
 	switch v := i.(type) {
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			m[ToString(k)] = val
 		}
 		return m, nil
-	case map[string]interface{}:
+	case map[string]any:
 		return v, nil
 	case string:
 		err := jsonStringToObject(v, &m)
 		return m, err
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]interface{}", i, i)
+		t := reflect.ValueOf(i)
+		if t.Kind() == reflect.Ptr {
+			t = t.Elem()
+		}
+		switch t.Kind() {
+		case reflect.Struct:
+			return structs.Map(v), nil
+		default:
+			return m, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
+		}
 	}
 }
 
+func ToFlatStringMapE(i any) (map[string]any, error) {
+	m, err := ToStringMapE(i)
+	if err != nil {
+		return nil, err
+	}
+
+	return flattenAndMergeMap(nil, m, "", "."), nil
+}
+
 // ToStringMapIntE casts an interface to a map[string]int{} type.
-func ToStringMapIntE(i interface{}) (map[string]int, error) {
+func ToStringMapIntE(i any) (map[string]int, error) {
 	var m = map[string]int{}
 	if i == nil {
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
 	}
 
 	switch v := i.(type) {
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			m[ToString(k)] = ToInt(val)
 		}
 		return m, nil
-	case map[string]interface{}:
+	case map[string]any:
 		for k, val := range v {
 			m[k] = ToInt(val)
 		}
@@ -1103,19 +1123,19 @@ func ToStringMapIntE(i interface{}) (map[string]int, error) {
 }
 
 // ToStringMapInt64E casts an interface to a map[string]int64{} type.
-func ToStringMapInt64E(i interface{}) (map[string]int64, error) {
+func ToStringMapInt64E(i any) (map[string]int64, error) {
 	var m = map[string]int64{}
 	if i == nil {
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
 	}
 
 	switch v := i.(type) {
-	case map[interface{}]interface{}:
+	case map[any]any:
 		for k, val := range v {
 			m[ToString(k)] = ToInt64(val)
 		}
 		return m, nil
-	case map[string]interface{}:
+	case map[string]any:
 		for k, val := range v {
 			m[k] = ToInt64(val)
 		}
@@ -1142,25 +1162,25 @@ func ToStringMapInt64E(i interface{}) (map[string]int64, error) {
 	return m, nil
 }
 
-// ToSliceE casts an interface to a []interface{} type.
-func ToSliceE(i interface{}) ([]interface{}, error) {
-	var s []interface{}
+// ToSliceE casts an interface to a []any type.
+func ToSliceE(i any) ([]any, error) {
+	var s []any
 
 	switch v := i.(type) {
-	case []interface{}:
+	case []any:
 		return append(s, v...), nil
-	case []map[string]interface{}:
+	case []map[string]any:
 		for _, u := range v {
 			s = append(s, u)
 		}
 		return s, nil
 	default:
-		return s, fmt.Errorf("unable to cast %#v of type %T to []interface{}", i, i)
+		return s, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
 	}
 }
 
 // ToBoolSliceE casts an interface to a []bool type.
-func ToBoolSliceE(i interface{}) ([]bool, error) {
+func ToBoolSliceE(i any) ([]bool, error) {
 	if i == nil {
 		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
 	}
@@ -1189,11 +1209,11 @@ func ToBoolSliceE(i interface{}) ([]bool, error) {
 }
 
 // ToStringSliceE casts an interface to a []string type.
-func ToStringSliceE(i interface{}) ([]string, error) {
+func ToStringSliceE(i any) ([]string, error) {
 	var a []string
 
 	switch v := i.(type) {
-	case []interface{}:
+	case []any:
 		for _, u := range v {
 			a = append(a, ToString(u))
 		}
@@ -1237,7 +1257,7 @@ func ToStringSliceE(i interface{}) ([]string, error) {
 			a = append(a, err.Error())
 		}
 		return a, nil
-	case interface{}:
+	case any:
 		str, err := ToStringE(v)
 		if err != nil {
 			return a, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
@@ -1249,7 +1269,7 @@ func ToStringSliceE(i interface{}) ([]string, error) {
 }
 
 // ToIntSliceE casts an interface to a []int type.
-func ToIntSliceE(i interface{}) ([]int, error) {
+func ToIntSliceE(i any) ([]int, error) {
 	if i == nil {
 		return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
 	}
@@ -1278,7 +1298,7 @@ func ToIntSliceE(i interface{}) ([]int, error) {
 }
 
 // ToDurationSliceE casts an interface to a []time.Duration type.
-func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
+func ToDurationSliceE(i any) ([]time.Duration, error) {
 	if i == nil {
 		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
 	}
@@ -1306,7 +1326,7 @@ func ToDurationSliceE(i interface{}) ([]time.Duration, error) {
 	}
 }
 
-func ToErrorE(i interface{}) (error, error) {
+func ToErrorE(i any) (error, error) {
 	switch v := i.(type) {
 	case error:
 		return v, nil
