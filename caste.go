@@ -13,8 +13,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/fatih/structs"
 )
 
 // ToTimeE casts an interface to a time.Time type.
@@ -1059,16 +1057,7 @@ func ToStringMapE(i any) (map[string]any, error) {
 		err := jsonStringToObject(v, &m)
 		return m, err
 	default:
-		t := reflect.ValueOf(i)
-		if t.Kind() == reflect.Ptr {
-			t = t.Elem()
-		}
-		switch t.Kind() {
-		case reflect.Struct:
-			return structs.Map(v), nil
-		default:
-			return m, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
-		}
+		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
 	}
 }
 
