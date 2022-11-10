@@ -22,20 +22,13 @@ var (
 
 // ToTimeE casts an interface to a time.Time type.
 func ToTimeE(i any) (tim time.Time, err error) {
-	return ToTimeInDefaultLocationE(i, time.UTC)
-}
-
-// ToTimeInDefaultLocationE casts an empty interface to time.Time,
-// interpreting inputs without a timezone to be in the given location,
-// or the local timezone if nil.
-func ToTimeInDefaultLocationE(i any, location *time.Location) (tim time.Time, err error) {
 	i = indirect(i)
 
 	switch v := i.(type) {
 	case time.Time:
 		return v, nil
 	case string:
-		return stringToDateInDefaultLocation(v, location)
+		return parseDate(v)
 	case json.Number:
 		s, err1 := ToInt64E(v)
 		if err1 != nil {
@@ -121,12 +114,9 @@ func ToBoolE(i any) (bool, error) {
 func ToFloat64E(i any) (float64, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return float64(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return float64(s), nil
 	case float64:
 		return s, nil
 	case float32:
@@ -177,12 +167,9 @@ func ToFloat64E(i any) (float64, error) {
 func ToFloat32E(i any) (float32, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return float32(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return float32(s), nil
 	case float64:
 		return float32(s), nil
 	case float32:
@@ -233,12 +220,9 @@ func ToFloat32E(i any) (float32, error) {
 func ToInt64E(i any) (int64, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return int64(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return int64(s), nil
 	case int64:
 		return s, nil
 	case int32:
@@ -285,12 +269,9 @@ func ToInt64E(i any) (int64, error) {
 func ToInt32E(i any) (int32, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return int32(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return int32(s), nil
 	case int64:
 		return int32(s), nil
 	case int32:
@@ -337,12 +318,9 @@ func ToInt32E(i any) (int32, error) {
 func ToInt16E(i any) (int16, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return int16(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return int16(s), nil
 	case int64:
 		return int16(s), nil
 	case int32:
@@ -389,12 +367,9 @@ func ToInt16E(i any) (int16, error) {
 func ToInt8E(i any) (int8, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return int8(intv), nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return int8(s), nil
 	case int64:
 		return int8(s), nil
 	case int32:
@@ -441,12 +416,9 @@ func ToInt8E(i any) (int8, error) {
 func ToIntE(i any) (int, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		return intv, nil
-	}
-
 	switch s := i.(type) {
+	case int:
+		return s, nil
 	case int64:
 		return int(s), nil
 	case int32:
@@ -493,15 +465,12 @@ func ToIntE(i any) (int, error) {
 func ToUintE(i any) (uint, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		if intv < 0 {
+	switch s := i.(type) {
+	case int:
+		if s < 0 {
 			return 0, errNegativeNotAllowed
 		}
-		return uint(intv), nil
-	}
-
-	switch s := i.(type) {
+		return uint(s), nil
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
 		if err == nil {
@@ -569,15 +538,12 @@ func ToUintE(i any) (uint, error) {
 func ToUint64E(i any) (uint64, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		if intv < 0 {
+	switch s := i.(type) {
+	case int:
+		if s < 0 {
 			return 0, errNegativeNotAllowed
 		}
-		return uint64(intv), nil
-	}
-
-	switch s := i.(type) {
+		return uint64(s), nil
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
 		if err == nil {
@@ -645,15 +611,12 @@ func ToUint64E(i any) (uint64, error) {
 func ToUint32E(i any) (uint32, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		if intv < 0 {
+	switch s := i.(type) {
+	case int:
+		if s < 0 {
 			return 0, errNegativeNotAllowed
 		}
-		return uint32(intv), nil
-	}
-
-	switch s := i.(type) {
+		return uint32(s), nil
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
 		if err == nil {
@@ -721,15 +684,12 @@ func ToUint32E(i any) (uint32, error) {
 func ToUint16E(i any) (uint16, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		if intv < 0 {
+	switch s := i.(type) {
+	case int:
+		if s < 0 {
 			return 0, errNegativeNotAllowed
 		}
-		return uint16(intv), nil
-	}
-
-	switch s := i.(type) {
+		return uint16(s), nil
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
 		if err == nil {
@@ -797,15 +757,12 @@ func ToUint16E(i any) (uint16, error) {
 func ToUint8E(i any) (uint8, error) {
 	i = indirect(i)
 
-	intv, ok := toInt(i)
-	if ok {
-		if intv < 0 {
+	switch s := i.(type) {
+	case int:
+		if s < 0 {
 			return 0, errNegativeNotAllowed
 		}
-		return uint8(intv), nil
-	}
-
-	switch s := i.(type) {
+		return uint8(s), nil
 	case string:
 		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
 		if err == nil {
@@ -1326,4 +1283,21 @@ func ToErrorE(i any) (error, error) {
 	default:
 		return nil, fmt.Errorf("unable to cast %#v of type %T to error", i, i)
 	}
+}
+
+func trimZeroDecimal(s string) string {
+	var foundZero bool
+	for i := len(s); i > 0; i-- {
+		switch s[i-1] {
+		case '.':
+			if foundZero {
+				return s[:i-1]
+			}
+		case '0':
+			foundZero = true
+		default:
+			return s
+		}
+	}
+	return s
 }

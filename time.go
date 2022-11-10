@@ -6,13 +6,6 @@ import (
 	"time"
 )
 
-// stringToDateInDefaultLocation casts an empty interface to a time.Time,
-// interpreting inputs without a timezone to be in the given location,
-// or the local timezone if nil.
-func stringToDateInDefaultLocation(s string, location *time.Location) (time.Time, error) {
-	return parseDateWith(s, location, timeFormats)
-}
-
 type timeFormatType int
 
 const (
@@ -105,4 +98,8 @@ func parseDateWith(s string, location *time.Location, formats []timeFormat) (d t
 		}
 	}
 	return d, fmt.Errorf("unable to parse date: %s", s)
+}
+
+func parseDate(s string) (time.Time, error) {
+	return parseDateWith(s, time.Local, timeFormats)
 }

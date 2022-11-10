@@ -8,9 +8,7 @@ package cast
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"html/template"
-	"path"
 	"reflect"
 	"testing"
 	"time"
@@ -1006,128 +1004,6 @@ func TestToDurationE(t *testing.T) {
 		// Non-E test
 		v = ToDuration(test.input)
 		c.Assert(v, Equals, test.expect, errmsg)
-	}
-}
-
-func TestToTimeWithTimezones(t *testing.T) {
-	c := New(t)
-
-	est, err := time.LoadLocation("EST")
-	c.Assert(err, IsNil)
-
-	irn, err := time.LoadLocation("Iran")
-	c.Assert(err, IsNil)
-
-	swd, err := time.LoadLocation("Europe/Stockholm")
-	c.Assert(err, IsNil)
-
-	// Test same local time in different timezones
-	utc2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, time.UTC)
-	est2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, est)
-	irn2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, irn)
-	swd2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, swd)
-	loc2016 := time.Date(2016, time.January, 1, 0, 0, 0, 0, time.Local)
-
-	for i, format := range timeFormats {
-		format := format
-		if format.typ == timeFormatTimeOnly {
-			continue
-		}
-
-		nameBase := fmt.Sprintf("%d;timeFormatType=%d;%s", i, format.typ, format.format)
-
-		t.Run(path.Join(nameBase), func(t *testing.T) {
-			est2016str := est2016.Format(format.format)
-			swd2016str := swd2016.Format(format.format)
-
-			t.Run("without default location", func(t *testing.T) {
-				c := New(t)
-				converted, err := ToTimeE(est2016str)
-				c.Assert(err, IsNil)
-				if format.hasTimezone() {
-					// Converting inputs with a timezone should preserve it
-					assertTimeEqual(t, est2016, converted)
-					assertLocationEqual(t, est, converted.Location())
-				} else {
-					// Converting inputs without a timezone should be interpreted
-					// as a local time in UTC.
-					assertTimeEqual(t, utc2016, converted)
-					assertLocationEqual(t, time.UTC, converted.Location())
-				}
-			})
-
-			t.Run("local timezone without a default location", func(t *testing.T) {
-				c := New(t)
-				converted, err := ToTimeE(swd2016str)
-				c.Assert(err, IsNil)
-				if format.hasTimezone() {
-					// Converting inputs with a timezone should preserve it
-					assertTimeEqual(t, swd2016, converted)
-					assertLocationEqual(t, swd, converted.Location())
-				} else {
-					// Converting inputs without a timezone should be interpreted
-					// as a local time in UTC.
-					assertTimeEqual(t, utc2016, converted)
-					assertLocationEqual(t, time.UTC, converted.Location())
-				}
-			})
-
-			t.Run("nil default location", func(t *testing.T) {
-				c := New(t)
-
-				converted, err := ToTimeInDefaultLocationE(est2016str, nil)
-				c.Assert(err, IsNil)
-				if format.hasTimezone() {
-					// Converting inputs with a timezone should preserve it
-					assertTimeEqual(t, est2016, converted)
-					assertLocationEqual(t, est, converted.Location())
-				} else {
-					// Converting inputs without a timezone should be interpreted
-					// as a local time in the local timezone.
-					assertTimeEqual(t, loc2016, converted)
-					assertLocationEqual(t, time.Local, converted.Location())
-				}
-
-			})
-
-			t.Run("default location not UTC", func(t *testing.T) {
-				c := New(t)
-
-				converted, err := ToTimeInDefaultLocationE(est2016str, irn)
-				c.Assert(err, IsNil)
-				if format.hasTimezone() {
-					// Converting inputs with a timezone should preserve it
-					assertTimeEqual(t, est2016, converted)
-					assertLocationEqual(t, est, converted.Location())
-				} else {
-					// Converting inputs without a timezone should be interpreted
-					// as a local time in the given location.
-					assertTimeEqual(t, irn2016, converted)
-					assertLocationEqual(t, irn, converted.Location())
-				}
-
-			})
-
-			t.Run("time in the local timezone default location not UTC", func(t *testing.T) {
-				c := New(t)
-
-				converted, err := ToTimeInDefaultLocationE(swd2016str, irn)
-				c.Assert(err, IsNil)
-				if format.hasTimezone() {
-					// Converting inputs with a timezone should preserve it
-					assertTimeEqual(t, swd2016, converted)
-					assertLocationEqual(t, swd, converted.Location())
-				} else {
-					// Converting inputs without a timezone should be interpreted
-					// as a local time in the given location.
-					assertTimeEqual(t, irn2016, converted)
-					assertLocationEqual(t, irn, converted.Location())
-				}
-
-			})
-
-		})
-
 	}
 }
 
