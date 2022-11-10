@@ -7,12 +7,17 @@ package cast
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+)
+
+var (
+	errNegativeNotAllowed = errors.New("unable to cast negative value")
 )
 
 // ToTimeE casts an interface to a time.Time type.
@@ -945,7 +950,7 @@ func ToStringMapStringE(i any) (map[string]string, error) {
 		}
 		return m, nil
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
@@ -1008,7 +1013,7 @@ func ToStringMapStringSliceE(i any) (map[string][]string, error) {
 			m[key] = value
 		}
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
@@ -1034,7 +1039,7 @@ func ToStringMapBoolE(i any) (map[string]bool, error) {
 	case map[string]bool:
 		return v, nil
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]bool", i, i)
@@ -1054,7 +1059,7 @@ func ToStringMapE(i any) (map[string]any, error) {
 	case map[string]any:
 		return v, nil
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	default:
 		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
@@ -1067,7 +1072,7 @@ func ToFlatStringMapE(i any) (map[string]any, error) {
 		return nil, err
 	}
 
-	return flattenAndMergeMap(nil, m, "", "."), nil
+	return flattenMap(m), nil
 }
 
 // ToStringMapIntE casts an interface to a map[string]int{} type.
@@ -1091,7 +1096,7 @@ func ToStringMapIntE(i any) (map[string]int, error) {
 	case map[string]int:
 		return v, nil
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	}
 
@@ -1132,7 +1137,7 @@ func ToStringMapInt64E(i any) (map[string]int64, error) {
 	case map[string]int64:
 		return v, nil
 	case string:
-		err := jsonStringToObject(v, &m)
+		err := json.Unmarshal([]byte(v), &m)
 		return m, err
 	}
 

@@ -16,6 +16,7 @@ import (
 	"time"
 
 	. "github.com/frankban/quicktest"
+	"github.com/tidwall/gjson"
 )
 
 type testStep struct {
@@ -1190,6 +1191,38 @@ func TestError(t *testing.T) {
 	c.Assert(ToError("bar").Error(), Equals, "bar")
 }
 
+func TestFlattenMap(t *testing.T) {
+	c := New(t)
+
+	c.Assert(flattenMap(map[string]any{
+		"foo": "bar",
+		"baz": map[string]any{
+			"qux": []interface{}{
+				"quux",
+				"quuz",
+			},
+		},
+	}), DeepEquals, map[string]any{
+		"foo":       "bar",
+		"baz.qux.0": "quux",
+		"baz.qux.1": "quuz",
+	})
+
+	data, err := json.Marshal(map[string]any{
+		"foo": "bar",
+		"baz": map[string]any{
+			"qux": []interface{}{
+				"quux",
+				"quuz",
+			},
+		},
+	})
+	c.Assert(err, IsNil)
+	c.Assert(gjson.GetBytes(data, "foo").String(), Equals, "bar")
+	c.Assert(gjson.GetBytes(data, "baz.qux.0").String(), Equals, "quux")
+	c.Assert(gjson.GetBytes(data, "baz.qux.1").String(), Equals, "quuz")
+}
+
 func TestFlatStringMap(t *testing.T) {
 	c := New(t)
 	c.Assert(ToFlatStringMap(map[string]any{
@@ -1198,20 +1231,6 @@ func TestFlatStringMap(t *testing.T) {
 			"qux": "quux",
 		},
 	}), DeepEquals, map[string]any{
-		"foo":     "bar",
-		"baz.qux": "quux",
-	})
-
-	type Baz struct {
-		Qux string `json:"qux"`
-	}
-
-	type Foo struct {
-		Foo string `structs:"foo"`
-		Baz Baz    `structs:"baz"`
-	}
-
-	c.Assert(ToFlatStringMap(&Foo{"bar", Baz{"quux"}}), DeepEquals, map[string]any{
 		"foo":     "bar",
 		"baz.qux": "quux",
 	})
