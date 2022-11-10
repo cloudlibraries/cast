@@ -1192,12 +1192,12 @@ func TestError(t *testing.T) {
 
 func TestFlatStringMap(t *testing.T) {
 	c := New(t)
-	c.Assert(ToFlatStringMap(map[string]interface{}{
+	c.Assert(ToFlatStringMap(map[string]any{
 		"foo": "bar",
-		"baz": map[string]interface{}{
+		"baz": map[string]any{
 			"qux": "quux",
 		},
-	}), DeepEquals, map[string]interface{}{
+	}), DeepEquals, map[string]any{
 		"foo":     "bar",
 		"baz.qux": "quux",
 	})
@@ -1211,7 +1211,7 @@ func TestFlatStringMap(t *testing.T) {
 		Baz Baz    `structs:"baz"`
 	}
 
-	c.Assert(ToFlatStringMap(&Foo{"bar", Baz{"quux"}}), DeepEquals, map[string]interface{}{
+	c.Assert(ToFlatStringMap(&Foo{"bar", Baz{"quux"}}), DeepEquals, map[string]any{
 		"foo":     "bar",
 		"baz.qux": "quux",
 	})
