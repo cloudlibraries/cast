@@ -949,11 +949,8 @@ func ToStringMapStringE(i any) (map[string]string, error) {
 			m[ToString(k)] = ToString(val)
 		}
 		return m, nil
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
 	}
 }
 
@@ -1004,19 +1001,16 @@ func ToStringMapStringSliceE(i any) (map[string][]string, error) {
 		for k, val := range v {
 			key, err := ToStringE(k)
 			if err != nil {
-				return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
+				return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
 			}
 			value, err := ToStringSliceE(val)
 			if err != nil {
-				return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
+				return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
 			}
 			m[key] = value
 		}
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
 	}
 	return m, nil
 }
@@ -1038,11 +1032,8 @@ func ToStringMapBoolE(i any) (map[string]bool, error) {
 		return m, nil
 	case map[string]bool:
 		return v, nil
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]bool", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]bool", i, i)
 	}
 }
 
@@ -1058,28 +1049,40 @@ func ToStringMapE(i any) (map[string]any, error) {
 		return m, nil
 	case map[string]any:
 		return v, nil
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	default:
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
 	}
 }
 
-// func ToFlatStringMapE(i any) (map[string]any, error) {
-// 	m, err := ToStringMapE(i)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return flattenMap(m), nil
-// }
+func ToFlatMapE(i any) (map[string]any, error) {
+	switch v := i.(type) {
+	case map[any]any:
+		var m = map[string]any{}
+		for k, val := range v {
+			m[ToString(k)] = val
+		}
+		return flatten(m), nil
+	case map[string]any:
+		return flatten(v), nil
+	case []any:
+		var s = make([]any, 0)
+		return flatten(append(s, v...)), nil
+	case []map[string]any:
+		var s = make([]any, 0)
+		for _, u := range v {
+			s = append(s, u)
+		}
+		return flatten(s), nil
+	default:
+		return nil, fmt.Errorf("unable to cast %#v of type %T to flat map", i, i)
+	}
+}
 
 // ToStringMapIntE casts an interface to a map[string]int{} type.
 func ToStringMapIntE(i any) (map[string]int, error) {
 	var m = map[string]int{}
 	if i == nil {
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
 	}
 
 	switch v := i.(type) {
@@ -1095,13 +1098,10 @@ func ToStringMapIntE(i any) (map[string]int, error) {
 		return m, nil
 	case map[string]int:
 		return v, nil
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	}
 
 	if reflect.TypeOf(i).Kind() != reflect.Map {
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
 	}
 
 	mVal := reflect.ValueOf(m)
@@ -1109,7 +1109,7 @@ func ToStringMapIntE(i any) (map[string]int, error) {
 	for _, keyVal := range v.MapKeys() {
 		val, err := ToIntE(v.MapIndex(keyVal).Interface())
 		if err != nil {
-			return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
+			return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
 		}
 		mVal.SetMapIndex(keyVal, reflect.ValueOf(val))
 	}
@@ -1120,7 +1120,7 @@ func ToStringMapIntE(i any) (map[string]int, error) {
 func ToStringMapInt64E(i any) (map[string]int64, error) {
 	var m = map[string]int64{}
 	if i == nil {
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
 	}
 
 	switch v := i.(type) {
@@ -1136,20 +1136,17 @@ func ToStringMapInt64E(i any) (map[string]int64, error) {
 		return m, nil
 	case map[string]int64:
 		return v, nil
-	case string:
-		err := json.Unmarshal([]byte(v), &m)
-		return m, err
 	}
 
 	if reflect.TypeOf(i).Kind() != reflect.Map {
-		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
 	}
 	mVal := reflect.ValueOf(m)
 	v := reflect.ValueOf(i)
 	for _, keyVal := range v.MapKeys() {
 		val, err := ToInt64E(v.MapIndex(keyVal).Interface())
 		if err != nil {
-			return m, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
+			return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
 		}
 		mVal.SetMapIndex(keyVal, reflect.ValueOf(val))
 	}
@@ -1169,24 +1166,14 @@ func ToSliceE(i any) ([]any, error) {
 		}
 		return s, nil
 	default:
-		return s, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
 	}
 }
-
-// // TOFlatSliceE casts an interface to a []any type.
-// func ToFlatSliceE(i any) ([]any, error) {
-// 	s, err := ToSliceE(i)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return flattenSlice(s), nil
-// }
 
 // ToBoolSliceE casts an interface to a []bool type.
 func ToBoolSliceE(i any) ([]bool, error) {
 	if i == nil {
-		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
 	}
 
 	switch v := i.(type) {
@@ -1202,13 +1189,13 @@ func ToBoolSliceE(i any) ([]bool, error) {
 		for j := 0; j < s.Len(); j++ {
 			val, err := ToBoolE(s.Index(j).Interface())
 			if err != nil {
-				return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+				return nil, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
 			}
 			a[j] = val
 		}
 		return a, nil
 	default:
-		return []bool{}, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []bool", i, i)
 	}
 }
 
@@ -1264,18 +1251,18 @@ func ToStringSliceE(i any) ([]string, error) {
 	case any:
 		str, err := ToStringE(v)
 		if err != nil {
-			return a, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
+			return nil, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
 		}
 		return []string{str}, nil
 	default:
-		return a, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
 	}
 }
 
 // ToIntSliceE casts an interface to a []int type.
 func ToIntSliceE(i any) ([]int, error) {
 	if i == nil {
-		return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
 	}
 
 	switch v := i.(type) {
@@ -1291,20 +1278,20 @@ func ToIntSliceE(i any) ([]int, error) {
 		for j := 0; j < s.Len(); j++ {
 			val, err := ToIntE(s.Index(j).Interface())
 			if err != nil {
-				return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+				return nil, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
 			}
 			a[j] = val
 		}
 		return a, nil
 	default:
-		return []int{}, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []int", i, i)
 	}
 }
 
 // ToDurationSliceE casts an interface to a []time.Duration type.
 func ToDurationSliceE(i any) ([]time.Duration, error) {
 	if i == nil {
-		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
 	}
 
 	switch v := i.(type) {
@@ -1320,13 +1307,13 @@ func ToDurationSliceE(i any) ([]time.Duration, error) {
 		for j := 0; j < s.Len(); j++ {
 			val, err := ToDurationE(s.Index(j).Interface())
 			if err != nil {
-				return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+				return nil, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
 			}
 			a[j] = val
 		}
 		return a, nil
 	default:
-		return []time.Duration{}, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
+		return nil, fmt.Errorf("unable to cast %#v of type %T to []time.Duration", i, i)
 	}
 }
 

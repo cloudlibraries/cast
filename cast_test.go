@@ -1197,7 +1197,7 @@ func TestFlatten(t *testing.T) {
 	c.Assert(flatten(map[string]any{
 		"foo": "bar",
 		"baz": map[string]any{
-			"qux": []interface{}{
+			"qux": []any{
 				"quux",
 				"quuz",
 			},
@@ -1211,7 +1211,7 @@ func TestFlatten(t *testing.T) {
 	data, err := json.Marshal(map[string]any{
 		"foo": "bar",
 		"baz": map[string]any{
-			"qux": []interface{}{
+			"qux": []any{
 				"quux",
 				"quuz",
 			},
