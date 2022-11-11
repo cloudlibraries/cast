@@ -1,95 +1,129 @@
 package cast_test
 
-// import (
-// 	"encoding/json"
-// 	"errors"
-// 	"html/template"
-// 	"reflect"
-// 	"testing"
-// 	"time"
+import (
+	"encoding/json"
+	"errors"
+	"math/big"
+	"reflect"
+	"testing"
+	"time"
 
-// 	. "github.com/frankban/quicktest"
-// 	"github.com/tidwall/gjson"
-// )
+	. "github.com/frankban/quicktest"
+	"github.com/golibraries/cast"
+)
 
-// type testStep struct {
-// 	input  any
-// 	expect any
-// 	iserr  bool
-// }
+type testStep struct {
+	input  any
+	expect any
+	iserr  bool
+}
 
-// func createNumberTestSteps(zero, one, eight, eightnegative, eightpoint31, eightpoint31negative any) []testStep {
-// 	var jeight, jminuseight, jfloateight json.Number
-// 	_ = json.Unmarshal([]byte("8"), &jeight)
-// 	_ = json.Unmarshal([]byte("-8"), &jminuseight)
-// 	_ = json.Unmarshal([]byte("8.0"), &jfloateight)
+type stringer struct{ string }
 
-// 	kind := reflect.TypeOf(zero).Kind()
-// 	isUint := kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64
+func (s stringer) String() string {
+	return s.string
+}
 
-// 	// Some precision is lost when converting from float64 to float32.
-// 	eightpoint31_32 := eightpoint31
-// 	eightpoint31negative_32 := eightpoint31negative
-// 	if kind == reflect.Float64 {
-// 		eightpoint31_32 = float64(float32(eightpoint31.(float64)))
-// 		eightpoint31negative_32 = float64(float32(eightpoint31negative.(float64)))
-// 	}
+func createTestSteps(zero, one, eight, eightnegative, eightpoint31, eightpoint31negative any) []testStep {
+	var jeight, jminuseight, jfloateight json.Number
+	_ = json.Unmarshal([]byte("8"), &jeight)
+	_ = json.Unmarshal([]byte("-8"), &jminuseight)
+	_ = json.Unmarshal([]byte("8.0"), &jfloateight)
 
-// 	return []testStep{
-// 		{int(8), eight, false},
-// 		{int8(8), eight, false},
-// 		{int16(8), eight, false},
-// 		{int32(8), eight, false},
-// 		{int64(8), eight, false},
-// 		{time.Weekday(8), eight, false},
-// 		{time.Month(8), eight, false},
-// 		{uint(8), eight, false},
-// 		{uint8(8), eight, false},
-// 		{uint16(8), eight, false},
-// 		{uint32(8), eight, false},
-// 		{uint64(8), eight, false},
-// 		{float32(8.31), eightpoint31_32, false},
-// 		{float64(8.31), eightpoint31, false},
-// 		{true, one, false},
-// 		{false, zero, false},
-// 		{"8", eight, false},
-// 		{nil, zero, false},
-// 		{int(-8), eightnegative, isUint},
-// 		{int8(-8), eightnegative, isUint},
-// 		{int16(-8), eightnegative, isUint},
-// 		{int32(-8), eightnegative, isUint},
-// 		{int64(-8), eightnegative, isUint},
-// 		{float32(-8.31), eightpoint31negative_32, isUint},
-// 		{float64(-8.31), eightpoint31negative, isUint},
-// 		{"-8", eightnegative, isUint},
-// 		{jeight, eight, false},
-// 		{jminuseight, eightnegative, isUint},
-// 		{jfloateight, eight, false},
-// 		{"test", zero, true},
-// 		{testing.T{}, zero, true},
-// 	}
-// }
+	kind := reflect.TypeOf(zero).Kind()
+	isUint := kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64
 
-// // Maybe Go 1.18 generics will make this less ugly?
-// func runNumberTest(c *C, tests []testStep, tove func(any) (any, error), tov func(any) any) {
-// 	c.Helper()
+	// Some precision is lost when converting from float64 to float32.
+	eightpoint31_32 := eightpoint31
+	eightpoint31negative_32 := eightpoint31negative
+	if kind == reflect.Float64 {
+		eightpoint31_32 = float64(float32(eightpoint31.(float64)))
+		eightpoint31negative_32 = float64(float32(eightpoint31negative.(float64)))
+	}
 
-// 	for i, test := range tests {
-// 		errmsg := Commentf("i = %d", i)
+	return []testStep{
+		{int(8), eight, false},
+		{int8(8), eight, false},
+		{int16(8), eight, false},
+		{int32(8), eight, false},
+		{int64(8), eight, false},
+		{uint(8), eight, false},
+		{uint8(8), eight, false},
+		{uint16(8), eight, false},
+		{uint32(8), eight, false},
+		{uint64(8), eight, false},
+		{float32(8.31), eightpoint31_32, false},
+		{float64(8.31), eightpoint31, false},
+		{big.NewInt(8), eight, false},
+		{big.NewFloat(8.31), eightpoint31, false},
+		{big.NewRat(8, 1), eight, false},
+		{complex64(8), eight, false},
+		{complex128(8), eight, false},
+		{true, one, false},
+		{false, zero, false},
+		{"8", eight, false},
+		{[]byte{56}, eight, false},
+		{stringer{"8"}, eight, false},
+		{errors.New("8"), eight, false},
+		{time.Unix(0, 8), eight, false},
+		{time.Duration(8), eight, false},
+		{nil, zero, false},
+		{int(-8), eightnegative, isUint},
+		{int8(-8), eightnegative, isUint},
+		{int16(-8), eightnegative, isUint},
+		{int32(-8), eightnegative, isUint},
+		{int64(-8), eightnegative, isUint},
+		{float32(-8.31), eightpoint31negative_32, isUint},
+		{float64(-8.31), eightpoint31negative, isUint},
+		{big.NewInt(-8), eightnegative, isUint},
+		{big.NewFloat(-8.31), eightpoint31negative, isUint},
+		{big.NewRat(-8, 1), eightnegative, isUint},
+		{complex64(-8), eightnegative, isUint},
+		{complex128(-8), eightnegative, isUint},
+		{"-8", eightnegative, isUint},
+		{[]byte{45, 56}, eightnegative, isUint},
+		{stringer{"-8"}, eightnegative, isUint},
+		{errors.New("-8"), eightnegative, isUint},
+		{time.Unix(0, -8), eight, false},
+		{time.Duration(-8), eight, false},
+		{jeight, eight, false},
+		{jminuseight, eightnegative, isUint},
+		{jfloateight, eight, false},
+		{"test", zero, true},
+		{testing.T{}, zero, true},
+	}
+}
 
-// 		v, err := tove(test.input)
-// 		if test.iserr {
-// 			c.Assert(err, IsNotNil, errmsg)
-// 			continue
-// 		}
-// 		c.Assert(err, IsNil, errmsg)
-// 		c.Assert(v, Equals, test.expect, errmsg)
+func runTest(c *C, tests []testStep, tove func(any) (any, error), tov func(any) any) {
+	c.Helper()
 
-// 		// Non-E test:
-// 		v = tov(test.input)
-// 		c.Assert(v, Equals, test.expect, errmsg)
-// 	}
-// }
+	for i, test := range tests {
+		errmsg := Commentf("i = %d", i)
+
+		v, err := tove(test.input)
+		if test.iserr {
+			c.Assert(err, IsNotNil, errmsg)
+			continue
+		}
+		c.Assert(err, IsNil, errmsg)
+		c.Assert(v, Equals, test.expect, errmsg)
+
+		// Non-E test:
+		v = tov(test.input)
+		c.Assert(v, Equals, test.expect, errmsg)
+	}
+}
+
+func TestToIntE(t *testing.T) {
+	tests := createTestSteps(int(0), int(1), int(8), int(-8), int(8), int(-8))
+
+	runTest(
+		New(t),
+		tests,
+		func(v any) (any, error) { return cast.ToIntE(v) },
+		func(v any) any { return cast.ToInt(v) },
+	)
+}
 
 // func TestToUintE(t *testing.T) {
 // 	tests := createNumberTestSteps(uint(0), uint(1), uint(8), uint(0), uint(8), uint(8))
@@ -97,8 +131,8 @@ package cast_test
 // 	runNumberTest(
 // 		New(t),
 // 		tests,
-// 		func(v any) (any, error) { return ToUintE(v) },
-// 		func(v any) any { return ToUint(v) },
+// 		func(v any) (any, error) { return cast.ToUintE(v) },
+// 		func(v any) any { return cast.ToUint(v) },
 // 	)
 // }
 
@@ -143,16 +177,6 @@ package cast_test
 // 		tests,
 // 		func(v any) (any, error) { return ToUint8E(v) },
 // 		func(v any) any { return ToUint8(v) },
-// 	)
-// }
-// func TestToIntE(t *testing.T) {
-// 	tests := createNumberTestSteps(int(0), int(1), int(8), int(-8), int(8), int(-8))
-
-// 	runNumberTest(
-// 		New(t),
-// 		tests,
-// 		func(v any) (any, error) { return ToIntE(v) },
-// 		func(v any) any { return ToInt(v) },
 // 	)
 // }
 
