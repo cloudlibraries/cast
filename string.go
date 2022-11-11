@@ -1,9 +1,11 @@
 package cast
 
 import (
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
+	"time"
 
 	"github.com/shopspring/decimal"
 )
@@ -55,6 +57,10 @@ func ToStringE(a any) (string, error) {
 		return v.String(), nil
 	case *big.Rat:
 		return v.String(), nil
+	case complex64:
+		return fmt.Sprintf("(%v+%vi)", real(v), imag(v)), nil
+	case complex128:
+		return fmt.Sprintf("(%v+%vi)", real(v), imag(v)), nil
 	case bool:
 		return strconv.FormatBool(v), nil
 	case string:
@@ -65,6 +71,10 @@ func ToStringE(a any) (string, error) {
 		return v.String(), nil
 	case error:
 		return v.Error(), nil
+	case time.Time:
+		return v.String(), nil
+	case time.Duration:
+		return v.String(), nil
 	case nil:
 		return "", nil
 	default:
@@ -119,6 +129,10 @@ func ToBytesE(a any) ([]byte, error) {
 		return []byte(v.String()), nil
 	case *big.Rat:
 		return []byte(v.String()), nil
+	case complex64:
+		return []byte(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
+	case complex128:
+		return []byte(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
 	case bool:
 		return []byte(strconv.FormatBool(v)), nil
 	case string:
@@ -129,6 +143,10 @@ func ToBytesE(a any) ([]byte, error) {
 		return []byte(v.String()), nil
 	case error:
 		return []byte(v.Error()), nil
+	case time.Time:
+		return []byte(v.String()), nil
+	case time.Duration:
+		return []byte(v.String()), nil
 	case nil:
 		return []byte{}, nil
 	default:
@@ -147,12 +165,63 @@ func ToStringerE(a any) (fmt.Stringer, error) {
 	a = indirectToStringerOrError(a)
 
 	switch v := a.(type) {
+	case int:
+		return stringer{strconv.Itoa(v)}, nil
+	case int8:
+		return stringer{strconv.FormatInt(int64(v), 10)}, nil
+	case int16:
+		return stringer{strconv.FormatInt(int64(v), 10)}, nil
+	case int32:
+		return stringer{strconv.Itoa(int(v))}, nil
+	case int64:
+		return stringer{strconv.FormatInt(v, 10)}, nil
+	case uint:
+		return stringer{strconv.FormatUint(uint64(v), 10)}, nil
+	case uint8:
+		return stringer{strconv.FormatUint(uint64(v), 10)}, nil
+	case uint16:
+		return stringer{strconv.FormatUint(uint64(v), 10)}, nil
+	case uint32:
+		return stringer{strconv.FormatUint(uint64(v), 10)}, nil
+	case uint64:
+		return stringer{strconv.FormatUint(uint64(v), 10)}, nil
+	case float32:
+		// Use decimal to fix precision issue, FormatFloat is unstable.
+		// Optional:
+		//		return stringer{strconv.FormatFloat(float64(s), 'f', -1, 32)}, nil
+		return stringer{decimal.NewFromFloat32(v).String()}, nil
+	case float64:
+		// Use decimal to fix precision issue, FormatFloat is unstable.
+		// Optional:
+		// 		return stringer{strconv.FormatFloat(s, 'f', -1, 64)}, nil
+		return stringer{decimal.NewFromFloat(v).String()}, nil
+	case *big.Int:
+		return stringer{v.String()}, nil
+	case *big.Float:
+		return stringer{v.String()}, nil
+	case *big.Rat:
+		return stringer{v.String()}, nil
+	case complex64:
+		return stringer{fmt.Sprintf("(%v+%vi)", real(v), imag(v))}, nil
+	case complex128:
+		return stringer{fmt.Sprintf("(%v+%vi)", real(v), imag(v))}, nil
+	case bool:
+		return stringer{strconv.FormatBool(v)}, nil
+	case string:
+		return stringer{v}, nil
+	case []byte:
+		return stringer{string(v)}, nil
 	case fmt.Stringer:
 		return v, nil
+	case error:
+		return stringer{v.Error()}, nil
+	case time.Time:
+		return stringer{v.String()}, nil
+	case time.Duration:
+		return stringer{v.String()}, nil
+	case nil:
+		return stringer{""}, nil
 	default:
-		if _, err := ToStringE(a); err == nil {
-			return stringer{a}, nil
-		}
 		return nil, fmt.Errorf("unable to cast %#v of type %T to fmt.Stringer", a, a)
 	}
 }
@@ -168,37 +237,69 @@ func ToErrorE(a any) (error, error) {
 	a = indirectToStringerOrError(a)
 
 	switch v := a.(type) {
+	case int:
+		return errors.New(strconv.Itoa(v)), nil
+	case int8:
+		return errors.New(strconv.FormatInt(int64(v), 10)), nil
+	case int16:
+		return errors.New(strconv.FormatInt(int64(v), 10)), nil
+	case int32:
+		return errors.New(strconv.Itoa(int(v))), nil
+	case int64:
+		return errors.New(strconv.FormatInt(v, 10)), nil
+	case uint:
+		return errors.New(strconv.FormatUint(uint64(v), 10)), nil
+	case uint8:
+		return errors.New(strconv.FormatUint(uint64(v), 10)), nil
+	case uint16:
+		return errors.New(strconv.FormatUint(uint64(v), 10)), nil
+	case uint32:
+		return errors.New(strconv.FormatUint(uint64(v), 10)), nil
+	case uint64:
+		return errors.New(strconv.FormatUint(uint64(v), 10)), nil
+	case float32:
+		// Use decimal to fix precision issue, FormatFloat is unstable.
+		// Optional:
+		//		return errors.New(strconv.FormatFloat(float64(s), 'f', -1, 32)), nil
+		return errors.New(decimal.NewFromFloat32(v).String()), nil
+	case float64:
+		// Use decimal to fix precision issue, FormatFloat is unstable.
+		// Optional:
+		// 		return errors.New(strconv.FormatFloat(s, 'f', -1, 64)), nil
+		return errors.New(decimal.NewFromFloat(v).String()), nil
+	case *big.Int:
+		return errors.New(v.String()), nil
+	case *big.Float:
+		return errors.New(v.String()), nil
+	case *big.Rat:
+		return errors.New(v.String()), nil
+	case complex64:
+		return errors.New(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
+	case complex128:
+		return errors.New(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
+	case bool:
+		return errors.New(strconv.FormatBool(v)), nil
+	case string:
+		return errors.New(v), nil
+	case []byte:
+		return errors.New(string(v)), nil
+	case fmt.Stringer:
+		return errors.New(v.String()), nil
 	case error:
 		return v, nil
+	case time.Time:
+		return errors.New(v.String()), nil
+	case time.Duration:
+		return errors.New(v.String()), nil
+	case nil:
+		return nil, nil
 	default:
-		if _, err := ToStringE(a); err == nil {
-			return fmt.Errorf("%v", a), nil
-		}
 		return nil, fmt.Errorf("unable to cast %#v of type %T to error", a, a)
 	}
 }
 
-type stringer struct{ any }
+type stringer struct{ string }
 
 func (s stringer) String() string {
-	return ToString(any(s))
-}
-
-func autoParseInt(s string) (int64, error) {
-	var foundZero bool
-loop:
-	for i := len(s); i > 0; i-- {
-		switch s[i-1] {
-		case '.':
-			if foundZero {
-				s = s[:i-1]
-				break loop
-			}
-		case '0':
-			foundZero = true
-		default:
-			break loop
-		}
-	}
-	return strconv.ParseInt(s, 0, 0)
+	return s.string
 }
