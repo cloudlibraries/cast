@@ -861,10 +861,10 @@ func BenchmarkTooInt(b *testing.B) {
 
 func BenchmarkTrimZeroDecimal(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		trimZeroDecimal("")
-		trimZeroDecimal("123")
-		trimZeroDecimal("120")
-		trimZeroDecimal("120.00")
+		strToInt("")
+		strToInt("123")
+		strToInt("120")
+		strToInt("120.00")
 	}
 }
 
@@ -1007,15 +1007,14 @@ func TestToDurationE(t *testing.T) {
 	}
 }
 
-func TestTrimZeroDecimal(t *testing.T) {
+func TestTrimZero(t *testing.T) {
 	c := New(t)
 
-	c.Assert(trimZeroDecimal("10.0"), Equals, "10")
-	c.Assert(trimZeroDecimal("10.00"), Equals, "10")
-	c.Assert(trimZeroDecimal("10.010"), Equals, "10.010")
-	c.Assert(trimZeroDecimal("0.0000000000"), Equals, "0")
-	c.Assert(trimZeroDecimal("0.00000000001"), Equals, "0.00000000001")
-
+	c.Assert(ToInt("10.0"), Equals, 10)
+	c.Assert(ToInt("10.00"), Equals, 10)
+	c.Assert(ToFloat64("10.010"), Equals, 10.01)
+	c.Assert(ToInt("0.0000000000"), Equals, 0)
+	c.Assert(ToFloat64("0.00000000001"), Equals, 0.00000000001)
 }
 
 func assertTimeEqual(t *testing.T, expected, actual time.Time) {

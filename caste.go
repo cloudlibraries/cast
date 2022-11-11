@@ -7,7 +7,6 @@ package cast
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"reflect"
@@ -15,816 +14,6 @@ import (
 	"strings"
 	"time"
 )
-
-var (
-	errNegativeNotAllowed = errors.New("unable to cast negative value")
-)
-
-// ToTimeE casts an interface to a time.Time type.
-func ToTimeE(i any) (tim time.Time, err error) {
-	i = indirect(i)
-
-	switch v := i.(type) {
-	case time.Time:
-		return v, nil
-	case string:
-		return parseDate(v)
-	case json.Number:
-		s, err1 := ToInt64E(v)
-		if err1 != nil {
-			return time.Time{}, fmt.Errorf("unable to cast %#v of type %T to Time", i, i)
-		}
-		return time.Unix(s, 0), nil
-	case int:
-		return time.Unix(int64(v), 0), nil
-	case int64:
-		return time.Unix(v, 0), nil
-	case int32:
-		return time.Unix(int64(v), 0), nil
-	case uint:
-		return time.Unix(int64(v), 0), nil
-	case uint64:
-		return time.Unix(int64(v), 0), nil
-	case uint32:
-		return time.Unix(int64(v), 0), nil
-	default:
-		return time.Time{}, fmt.Errorf("unable to cast %#v of type %T to Time", i, i)
-	}
-}
-
-// ToDurationE casts an interface to a time.Duration type.
-func ToDurationE(i any) (d time.Duration, err error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case time.Duration:
-		return s, nil
-	case int, int64, int32, int16, int8, uint, uint64, uint32, uint16, uint8:
-		d = time.Duration(ToInt64(s))
-		return
-	case float32, float64:
-		d = time.Duration(ToFloat64(s))
-		return
-	case string:
-		if strings.ContainsAny(s, "nsuµmh") {
-			d, err = time.ParseDuration(s)
-		} else {
-			d, err = time.ParseDuration(s + "ns")
-		}
-		return
-	case json.Number:
-		var v float64
-		v, err = s.Float64()
-		d = time.Duration(v)
-		return
-	default:
-		err = fmt.Errorf("unable to cast %#v of type %T to Duration", i, i)
-		return
-	}
-}
-
-// ToBoolE casts an interface to a bool type.
-func ToBoolE(i any) (bool, error) {
-	i = indirect(i)
-
-	switch b := i.(type) {
-	case bool:
-		return b, nil
-	case nil:
-		return false, nil
-	case int:
-		if i.(int) != 0 {
-			return true, nil
-		}
-		return false, nil
-	case string:
-		return strconv.ParseBool(i.(string))
-	case json.Number:
-		v, err := ToInt64E(b)
-		if err == nil {
-			return v != 0, nil
-		}
-		return false, fmt.Errorf("unable to cast %#v of type %T to bool", i, i)
-	default:
-		return false, fmt.Errorf("unable to cast %#v of type %T to bool", i, i)
-	}
-}
-
-// ToFloat64E casts an interface to a float64 type.
-func ToFloat64E(i any) (float64, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return float64(s), nil
-	case float64:
-		return s, nil
-	case float32:
-		return float64(s), nil
-	case int64:
-		return float64(s), nil
-	case int32:
-		return float64(s), nil
-	case int16:
-		return float64(s), nil
-	case int8:
-		return float64(s), nil
-	case uint:
-		return float64(s), nil
-	case uint64:
-		return float64(s), nil
-	case uint32:
-		return float64(s), nil
-	case uint16:
-		return float64(s), nil
-	case uint8:
-		return float64(s), nil
-	case string:
-		v, err := strconv.ParseFloat(s, 64)
-		if err == nil {
-			return v, nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
-	case json.Number:
-		v, err := s.Float64()
-		if err == nil {
-			return v, nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", i, i)
-	}
-}
-
-// ToFloat32E casts an interface to a float32 type.
-func ToFloat32E(i any) (float32, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return float32(s), nil
-	case float64:
-		return float32(s), nil
-	case float32:
-		return s, nil
-	case int64:
-		return float32(s), nil
-	case int32:
-		return float32(s), nil
-	case int16:
-		return float32(s), nil
-	case int8:
-		return float32(s), nil
-	case uint:
-		return float32(s), nil
-	case uint64:
-		return float32(s), nil
-	case uint32:
-		return float32(s), nil
-	case uint16:
-		return float32(s), nil
-	case uint8:
-		return float32(s), nil
-	case string:
-		v, err := strconv.ParseFloat(s, 32)
-		if err == nil {
-			return float32(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
-	case json.Number:
-		v, err := s.Float64()
-		if err == nil {
-			return float32(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", i, i)
-	}
-}
-
-// ToInt64E casts an interface to an int64 type.
-func ToInt64E(i any) (int64, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return int64(s), nil
-	case int64:
-		return s, nil
-	case int32:
-		return int64(s), nil
-	case int16:
-		return int64(s), nil
-	case int8:
-		return int64(s), nil
-	case uint:
-		return int64(s), nil
-	case uint64:
-		return int64(s), nil
-	case uint32:
-		return int64(s), nil
-	case uint16:
-		return int64(s), nil
-	case uint8:
-		return int64(s), nil
-	case float64:
-		return int64(s), nil
-	case float32:
-		return int64(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			return v, nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
-	case json.Number:
-		return ToInt64E(string(s))
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
-	}
-}
-
-// ToInt32E casts an interface to an int32 type.
-func ToInt32E(i any) (int32, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return int32(s), nil
-	case int64:
-		return int32(s), nil
-	case int32:
-		return s, nil
-	case int16:
-		return int32(s), nil
-	case int8:
-		return int32(s), nil
-	case uint:
-		return int32(s), nil
-	case uint64:
-		return int32(s), nil
-	case uint32:
-		return int32(s), nil
-	case uint16:
-		return int32(s), nil
-	case uint8:
-		return int32(s), nil
-	case float64:
-		return int32(s), nil
-	case float32:
-		return int32(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			return int32(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int32", i, i)
-	case json.Number:
-		return ToInt32E(string(s))
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int32", i, i)
-	}
-}
-
-// ToInt16E casts an interface to an int16 type.
-func ToInt16E(i any) (int16, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return int16(s), nil
-	case int64:
-		return int16(s), nil
-	case int32:
-		return int16(s), nil
-	case int16:
-		return s, nil
-	case int8:
-		return int16(s), nil
-	case uint:
-		return int16(s), nil
-	case uint64:
-		return int16(s), nil
-	case uint32:
-		return int16(s), nil
-	case uint16:
-		return int16(s), nil
-	case uint8:
-		return int16(s), nil
-	case float64:
-		return int16(s), nil
-	case float32:
-		return int16(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			return int16(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int16", i, i)
-	case json.Number:
-		return ToInt16E(string(s))
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int16", i, i)
-	}
-}
-
-// ToInt8E casts an interface to an int8 type.
-func ToInt8E(i any) (int8, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return int8(s), nil
-	case int64:
-		return int8(s), nil
-	case int32:
-		return int8(s), nil
-	case int16:
-		return int8(s), nil
-	case int8:
-		return s, nil
-	case uint:
-		return int8(s), nil
-	case uint64:
-		return int8(s), nil
-	case uint32:
-		return int8(s), nil
-	case uint16:
-		return int8(s), nil
-	case uint8:
-		return int8(s), nil
-	case float64:
-		return int8(s), nil
-	case float32:
-		return int8(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			return int8(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int8", i, i)
-	case json.Number:
-		return ToInt8E(string(s))
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int8", i, i)
-	}
-}
-
-// ToIntE casts an interface to an int type.
-func ToIntE(i any) (int, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		return s, nil
-	case int64:
-		return int(s), nil
-	case int32:
-		return int(s), nil
-	case int16:
-		return int(s), nil
-	case int8:
-		return int(s), nil
-	case uint:
-		return int(s), nil
-	case uint64:
-		return int(s), nil
-	case uint32:
-		return int(s), nil
-	case uint16:
-		return int(s), nil
-	case uint8:
-		return int(s), nil
-	case float64:
-		return int(s), nil
-	case float32:
-		return int(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			return int(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", i, i)
-	case json.Number:
-		return ToIntE(string(s))
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to int", i, i)
-	}
-}
-
-// ToUintE casts an interface to a uint type.
-func ToUintE(i any) (uint, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			if v < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint", i, i)
-	case json.Number:
-		return ToUintE(string(s))
-	case int64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case int32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case int16:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case int8:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case uint:
-		return s, nil
-	case uint64:
-		return uint(s), nil
-	case uint32:
-		return uint(s), nil
-	case uint16:
-		return uint(s), nil
-	case uint8:
-		return uint(s), nil
-	case float64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case float32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint(s), nil
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint", i, i)
-	}
-}
-
-// ToUint64E casts an interface to a uint64 type.
-func ToUint64E(i any) (uint64, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			if v < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint64(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint64", i, i)
-	case json.Number:
-		return ToUint64E(string(s))
-	case int64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case int32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case int16:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case int8:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case uint:
-		return uint64(s), nil
-	case uint64:
-		return s, nil
-	case uint32:
-		return uint64(s), nil
-	case uint16:
-		return uint64(s), nil
-	case uint8:
-		return uint64(s), nil
-	case float32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case float64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint64(s), nil
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint64", i, i)
-	}
-}
-
-// ToUint32E casts an interface to a uint32 type.
-func ToUint32E(i any) (uint32, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			if v < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint32(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint32", i, i)
-	case json.Number:
-		return ToUint32E(string(s))
-	case int64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case int32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case int16:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case int8:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case uint:
-		return uint32(s), nil
-	case uint64:
-		return uint32(s), nil
-	case uint32:
-		return s, nil
-	case uint16:
-		return uint32(s), nil
-	case uint8:
-		return uint32(s), nil
-	case float64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case float32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint32(s), nil
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint32", i, i)
-	}
-}
-
-// ToUint16E casts an interface to a uint16 type.
-func ToUint16E(i any) (uint16, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			if v < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint16(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint16", i, i)
-	case json.Number:
-		return ToUint16E(string(s))
-	case int64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case int32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case int16:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case int8:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case uint:
-		return uint16(s), nil
-	case uint64:
-		return uint16(s), nil
-	case uint32:
-		return uint16(s), nil
-	case uint16:
-		return s, nil
-	case uint8:
-		return uint16(s), nil
-	case float64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case float32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint16(s), nil
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint16", i, i)
-	}
-}
-
-// ToUint8E casts an interface to a uint type.
-func ToUint8E(i any) (uint8, error) {
-	i = indirect(i)
-
-	switch s := i.(type) {
-	case int:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case string:
-		v, err := strconv.ParseInt(trimZeroDecimal(s), 0, 0)
-		if err == nil {
-			if v < 0 {
-				return 0, errNegativeNotAllowed
-			}
-			return uint8(v), nil
-		}
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint8", i, i)
-	case json.Number:
-		return ToUint8E(string(s))
-	case int64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case int32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case int16:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case int8:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case uint:
-		return uint8(s), nil
-	case uint64:
-		return uint8(s), nil
-	case uint32:
-		return uint8(s), nil
-	case uint16:
-		return uint8(s), nil
-	case uint8:
-		return s, nil
-	case float64:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case float32:
-		if s < 0 {
-			return 0, errNegativeNotAllowed
-		}
-		return uint8(s), nil
-	case bool:
-		if s {
-			return 1, nil
-		}
-		return 0, nil
-	case nil:
-		return 0, nil
-	default:
-		return 0, fmt.Errorf("unable to cast %#v of type %T to uint8", i, i)
-	}
-}
 
 // ToStringE casts an interface to a string type.
 func ToStringE(i any) (string, error) {
@@ -884,6 +73,33 @@ func ToStringE(i any) (string, error) {
 	}
 }
 
+// ToBoolE casts an interface to a bool type.
+func ToBoolE(i any) (bool, error) {
+	i = indirect(i)
+
+	switch b := i.(type) {
+	case bool:
+		return b, nil
+	case nil:
+		return false, nil
+	case int:
+		if i.(int) != 0 {
+			return true, nil
+		}
+		return false, nil
+	case string:
+		return strconv.ParseBool(i.(string))
+	case json.Number:
+		v, err := ToInt64E(b)
+		if err == nil {
+			return v != 0, nil
+		}
+		return false, fmt.Errorf("unable to cast %#v of type %T to bool", i, i)
+	default:
+		return false, fmt.Errorf("unable to cast %#v of type %T to bool", i, i)
+	}
+}
+
 // ToStringMapStringE casts an interface to a map[string]string type.
 func ToStringMapStringE(i any) (map[string]string, error) {
 	var m = map[string]string{}
@@ -907,208 +123,10 @@ func ToStringMapStringE(i any) (map[string]string, error) {
 		}
 		return m, nil
 	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
+		return m, fmt.Errorf("unable to cast %#v of type %T to map[string]string", i, i)
 	}
 }
 
-// ToStringMapStringSliceE casts an interface to a map[string][]string type.
-func ToStringMapStringSliceE(i any) (map[string][]string, error) {
-	var m = map[string][]string{}
-
-	switch v := i.(type) {
-	case map[string][]string:
-		return v, nil
-	case map[string][]any:
-		for k, val := range v {
-			m[ToString(k)] = ToStringSlice(val)
-		}
-		return m, nil
-	case map[string]string:
-		for k, val := range v {
-			m[ToString(k)] = []string{val}
-		}
-	case map[string]any:
-		for k, val := range v {
-			switch vt := val.(type) {
-			case []any:
-				m[ToString(k)] = ToStringSlice(vt)
-			case []string:
-				m[ToString(k)] = vt
-			default:
-				m[ToString(k)] = []string{ToString(val)}
-			}
-		}
-		return m, nil
-	case map[any][]string:
-		for k, val := range v {
-			m[ToString(k)] = ToStringSlice(val)
-		}
-		return m, nil
-	case map[any]string:
-		for k, val := range v {
-			m[ToString(k)] = ToStringSlice(val)
-		}
-		return m, nil
-	case map[any][]any:
-		for k, val := range v {
-			m[ToString(k)] = ToStringSlice(val)
-		}
-		return m, nil
-	case map[any]any:
-		for k, val := range v {
-			key, err := ToStringE(k)
-			if err != nil {
-				return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-			}
-			value, err := ToStringSliceE(val)
-			if err != nil {
-				return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-			}
-			m[key] = value
-		}
-	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string][]string", i, i)
-	}
-	return m, nil
-}
-
-// ToStringMapBoolE casts an interface to a map[string]bool type.
-func ToStringMapBoolE(i any) (map[string]bool, error) {
-	var m = map[string]bool{}
-
-	switch v := i.(type) {
-	case map[any]any:
-		for k, val := range v {
-			m[ToString(k)] = ToBool(val)
-		}
-		return m, nil
-	case map[string]any:
-		for k, val := range v {
-			m[ToString(k)] = ToBool(val)
-		}
-		return m, nil
-	case map[string]bool:
-		return v, nil
-	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]bool", i, i)
-	}
-}
-
-// ToStringMapE casts an interface to a map[string]any type.
-func ToStringMapE(i any) (map[string]any, error) {
-	var m = map[string]any{}
-
-	switch v := i.(type) {
-	case map[any]any:
-		for k, val := range v {
-			m[ToString(k)] = val
-		}
-		return m, nil
-	case map[string]any:
-		return v, nil
-	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]any", i, i)
-	}
-}
-
-func ToFlatMapE(i any) (map[string]any, error) {
-	switch v := i.(type) {
-	case map[any]any:
-		var m = map[string]any{}
-		for k, val := range v {
-			m[ToString(k)] = val
-		}
-		return flatten(m), nil
-	case map[string]any:
-		return flatten(v), nil
-	case []any:
-		var s = make([]any, 0)
-		return flatten(append(s, v...)), nil
-	case []map[string]any:
-		var s = make([]any, 0)
-		for _, u := range v {
-			s = append(s, u)
-		}
-		return flatten(s), nil
-	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to flat map", i, i)
-	}
-}
-
-// ToStringMapIntE casts an interface to a map[string]int{} type.
-func ToStringMapIntE(i any) (map[string]int, error) {
-	var m = map[string]int{}
-	if i == nil {
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
-	}
-
-	switch v := i.(type) {
-	case map[any]any:
-		for k, val := range v {
-			m[ToString(k)] = ToInt(val)
-		}
-		return m, nil
-	case map[string]any:
-		for k, val := range v {
-			m[k] = ToInt(val)
-		}
-		return m, nil
-	case map[string]int:
-		return v, nil
-	}
-
-	if reflect.TypeOf(i).Kind() != reflect.Map {
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
-	}
-
-	mVal := reflect.ValueOf(m)
-	v := reflect.ValueOf(i)
-	for _, keyVal := range v.MapKeys() {
-		val, err := ToIntE(v.MapIndex(keyVal).Interface())
-		if err != nil {
-			return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int", i, i)
-		}
-		mVal.SetMapIndex(keyVal, reflect.ValueOf(val))
-	}
-	return m, nil
-}
-
-// ToStringMapInt64E casts an interface to a map[string]int64{} type.
-func ToStringMapInt64E(i any) (map[string]int64, error) {
-	var m = map[string]int64{}
-	if i == nil {
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
-	}
-
-	switch v := i.(type) {
-	case map[any]any:
-		for k, val := range v {
-			m[ToString(k)] = ToInt64(val)
-		}
-		return m, nil
-	case map[string]any:
-		for k, val := range v {
-			m[k] = ToInt64(val)
-		}
-		return m, nil
-	case map[string]int64:
-		return v, nil
-	}
-
-	if reflect.TypeOf(i).Kind() != reflect.Map {
-		return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
-	}
-	mVal := reflect.ValueOf(m)
-	v := reflect.ValueOf(i)
-	for _, keyVal := range v.MapKeys() {
-		val, err := ToInt64E(v.MapIndex(keyVal).Interface())
-		if err != nil {
-			return nil, fmt.Errorf("unable to cast %#v of type %T to map[string]int64", i, i)
-		}
-		mVal.SetMapIndex(keyVal, reflect.ValueOf(val))
-	}
-	return m, nil
-}
 
 // ToSliceE casts an interface to a []any type.
 func ToSliceE(i any) ([]any, error) {
@@ -1123,7 +141,7 @@ func ToSliceE(i any) ([]any, error) {
 		}
 		return s, nil
 	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
+		return s, fmt.Errorf("unable to cast %#v of type %T to []any", i, i)
 	}
 }
 
@@ -1158,61 +176,61 @@ func ToBoolSliceE(i any) ([]bool, error) {
 
 // ToStringSliceE casts an interface to a []string type.
 func ToStringSliceE(i any) ([]string, error) {
-	var a []string
+	var s []string
 
 	switch v := i.(type) {
 	case []any:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []string:
 		return v, nil
 	case []int8:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []int:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []int32:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []int64:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []float32:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case []float64:
 		for _, u := range v {
-			a = append(a, ToString(u))
+			s = append(s, ToString(u))
 		}
-		return a, nil
+		return s, nil
 	case string:
 		return strings.Fields(v), nil
 	case []error:
 		for _, err := range i.([]error) {
-			a = append(a, err.Error())
+			s = append(s, err.Error())
 		}
-		return a, nil
+		return s, nil
 	case any:
 		str, err := ToStringE(v)
 		if err != nil {
-			return nil, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
+			return s, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
 		}
 		return []string{str}, nil
 	default:
-		return nil, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
+		return s, fmt.Errorf("unable to cast %#v of type %T to []string", i, i)
 	}
 }
 
@@ -1283,21 +301,4 @@ func ToErrorE(i any) (error, error) {
 	default:
 		return nil, fmt.Errorf("unable to cast %#v of type %T to error", i, i)
 	}
-}
-
-func trimZeroDecimal(s string) string {
-	var foundZero bool
-	for i := len(s); i > 0; i-- {
-		switch s[i-1] {
-		case '.':
-			if foundZero {
-				return s[:i-1]
-			}
-		case '0':
-			foundZero = true
-		default:
-			return s
-		}
-	}
-	return s
 }
