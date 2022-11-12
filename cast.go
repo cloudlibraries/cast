@@ -75,6 +75,10 @@ func ToIntE(a any) (int, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return int(v.UnixNano()), nil
+	case time.Duration:
+		return int(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -99,10 +103,6 @@ func ToIntE(a any) (int, error) {
 			return int(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int", a, a)
-	case time.Time:
-		return int(v.UnixNano()), nil
-	case time.Duration:
-		return int(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -171,6 +171,10 @@ func ToInt8E(a any) (int8, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return int8(v.UnixNano()), nil
+	case time.Duration:
+		return int8(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -195,10 +199,6 @@ func ToInt8E(a any) (int8, error) {
 			return int8(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int8", v, v)
-	case time.Time:
-		return int8(v.UnixNano()), nil
-	case time.Duration:
-		return int8(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -267,6 +267,10 @@ func ToInt16E(a any) (int16, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return int16(v.UnixNano()), nil
+	case time.Duration:
+		return int16(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -291,10 +295,6 @@ func ToInt16E(a any) (int16, error) {
 			return int16(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int16", a, a)
-	case time.Time:
-		return int16(v.UnixNano()), nil
-	case time.Duration:
-		return int16(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -363,6 +363,10 @@ func ToInt32E(a any) (int32, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return int32(v.UnixNano()), nil
+	case time.Duration:
+		return int32(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -387,10 +391,6 @@ func ToInt32E(a any) (int32, error) {
 			return int32(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int32", a, a)
-	case time.Time:
-		return int32(v.UnixNano()), nil
-	case time.Duration:
-		return int32(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -459,6 +459,10 @@ func ToInt64E(a any) (int64, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return v.UnixNano(), nil
+	case time.Duration:
+		return int64(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -483,10 +487,6 @@ func ToInt64E(a any) (int64, error) {
 			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to int64", a, a)
-	case time.Time:
-		return v.UnixNano(), nil
-	case time.Duration:
-		return int64(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -585,6 +585,10 @@ func ToUintE(a any) (uint, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return uint(v.UnixNano()), nil
+	case time.Duration:
+		return uint(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -621,10 +625,6 @@ func ToUintE(a any) (uint, error) {
 			return uint(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint", a, a)
-	case time.Time:
-		return uint(v.UnixNano()), nil
-	case time.Duration:
-		return uint(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -723,6 +723,10 @@ func ToUint8E(a any) (uint8, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return uint8(v.UnixNano()), nil
+	case time.Duration:
+		return uint8(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -759,10 +763,6 @@ func ToUint8E(a any) (uint8, error) {
 			return uint8(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint8", a, a)
-	case time.Time:
-		return uint8(v.UnixNano()), nil
-	case time.Duration:
-		return uint8(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -861,6 +861,10 @@ func ToUint16E(a any) (uint16, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return uint16(v.UnixNano()), nil
+	case time.Duration:
+		return uint16(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -897,10 +901,6 @@ func ToUint16E(a any) (uint16, error) {
 			return uint16(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint16", a, a)
-	case time.Time:
-		return uint16(v.UnixNano()), nil
-	case time.Duration:
-		return uint16(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -999,6 +999,10 @@ func ToUint32E(a any) (uint32, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return uint32(v.UnixNano()), nil
+	case time.Duration:
+		return uint32(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -1035,10 +1039,6 @@ func ToUint32E(a any) (uint32, error) {
 			return uint32(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint32", a, a)
-	case time.Time:
-		return uint32(v.UnixNano()), nil
-	case time.Duration:
-		return uint32(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -1137,6 +1137,10 @@ func ToUint64E(a any) (uint64, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return uint64(v.UnixNano()), nil
+	case time.Duration:
+		return uint64(v), nil
 	case string:
 		n, err := parseInt(v)
 		if err == nil {
@@ -1173,10 +1177,6 @@ func ToUint64E(a any) (uint64, error) {
 			return uint64(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to uint64", a, a)
-	case time.Time:
-		return uint64(v.UnixNano()), nil
-	case time.Duration:
-		return uint64(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -1246,6 +1246,10 @@ func ToFloat32E(a any) (float32, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return float32(v.UnixNano()), nil
+	case time.Duration:
+		return float32(v), nil
 	case string:
 		n, err := strconv.ParseFloat(v, 32)
 		if err == nil {
@@ -1270,10 +1274,6 @@ func ToFloat32E(a any) (float32, error) {
 			return float32(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float32", a, a)
-	case time.Time:
-		return float32(v.UnixNano()), nil
-	case time.Duration:
-		return float32(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -1343,6 +1343,10 @@ func ToFloat64E(a any) (float64, error) {
 			return 1, nil
 		}
 		return 0, nil
+	case time.Time:
+		return float64(v.UnixNano()), nil
+	case time.Duration:
+		return float64(v), nil
 	case string:
 		n, err := strconv.ParseFloat(v, 64)
 		if err == nil {
@@ -1367,10 +1371,6 @@ func ToFloat64E(a any) (float64, error) {
 			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to float64", a, a)
-	case time.Time:
-		return float64(v.UnixNano()), nil
-	case time.Duration:
-		return float64(v), nil
 	case nil:
 		return 0, nil
 	default:
@@ -1447,6 +1447,10 @@ func ToBigIntE(a any) (*big.Int, error) {
 			return big.NewInt(1), nil
 		}
 		return big.NewInt(0), nil
+	case time.Time:
+		return big.NewInt(0).SetInt64(v.UnixNano()), nil
+	case time.Duration:
+		return big.NewInt(0).SetInt64(int64(v)), nil
 	case string:
 		n, ok := new(big.Int).SetString(v, 0)
 		if ok {
@@ -1471,10 +1475,6 @@ func ToBigIntE(a any) (*big.Int, error) {
 			return n, nil
 		}
 		return big.NewInt(0), fmt.Errorf("unable to cast %#v of type %T to *big.Int", a, a)
-	case time.Time:
-		return big.NewInt(0).SetInt64(v.UnixNano()), nil
-	case time.Duration:
-		return big.NewInt(0).SetInt64(int64(v)), nil
 	case nil:
 		return big.NewInt(0), nil
 	default:
@@ -1548,6 +1548,10 @@ func ToBigFloatE(a any) (*big.Float, error) {
 			return big.NewFloat(1), nil
 		}
 		return big.NewFloat(0), nil
+	case time.Time:
+		return big.NewFloat(0).SetInt64(v.UnixNano()), nil
+	case time.Duration:
+		return big.NewFloat(0).SetInt64(int64(v)), nil
 	case string:
 		n, ok := new(big.Float).SetString(v)
 		if ok {
@@ -1572,10 +1576,6 @@ func ToBigFloatE(a any) (*big.Float, error) {
 			return n, nil
 		}
 		return big.NewFloat(0), fmt.Errorf("unable to cast %#v of type %T to *big.Float", a, a)
-	case time.Time:
-		return big.NewFloat(0).SetInt64(v.UnixNano()), nil
-	case time.Duration:
-		return big.NewFloat(0).SetInt64(int64(v)), nil
 	case nil:
 		return big.NewFloat(0), nil
 	default:
@@ -1649,6 +1649,10 @@ func ToBigRatE(a any) (*big.Rat, error) {
 			return big.NewRat(1, 1), nil
 		}
 		return big.NewRat(0, 1), nil
+	case time.Time:
+		return big.NewRat(0, 1).SetInt64(v.UnixNano()), nil
+	case time.Duration:
+		return big.NewRat(0, 1).SetInt64(int64(v)), nil
 	case string:
 		n, ok := new(big.Rat).SetString(v)
 		if ok {
@@ -1673,10 +1677,6 @@ func ToBigRatE(a any) (*big.Rat, error) {
 			return n, nil
 		}
 		return big.NewRat(0, 1), fmt.Errorf("unable to cast %#v of type %T to *big.Rat", a, a)
-	case time.Time:
-		return big.NewRat(0, 1).SetInt64(v.UnixNano()), nil
-	case time.Duration:
-		return big.NewRat(0, 1).SetInt64(int64(v)), nil
 	case nil:
 		return big.NewRat(0, 1), nil
 	default:
@@ -1746,6 +1746,10 @@ func ToComplex64E(a any) (complex64, error) {
 			return complex(1, 0), nil
 		}
 		return complex(0, 0), nil
+	case time.Time:
+		return complex(float32(v.UnixNano()), 0), nil
+	case time.Duration:
+		return complex(float32(v), 0), nil
 	case string:
 		n, err := strconv.ParseFloat(v, 32)
 		if err == nil {
@@ -1770,10 +1774,6 @@ func ToComplex64E(a any) (complex64, error) {
 			return complex(float32(n), 0), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex64", a, a)
-	case time.Time:
-		return complex(float32(v.UnixNano()), 0), nil
-	case time.Duration:
-		return complex(float32(v), 0), nil
 	case nil:
 		return complex(0, 0), nil
 	default:
@@ -1843,6 +1843,10 @@ func ToComplex128E(a any) (complex128, error) {
 			return complex(1, 0), nil
 		}
 		return complex(0, 0), nil
+	case time.Time:
+		return complex(float64(v.UnixNano()), 0), nil
+	case time.Duration:
+		return complex(float64(v), 0), nil
 	case string:
 		n, err := strconv.ParseFloat(v, 64)
 		if err == nil {
@@ -1867,10 +1871,6 @@ func ToComplex128E(a any) (complex128, error) {
 			return complex(n, 0), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex128", a, a)
-	case time.Time:
-		return complex(float64(v.UnixNano()), 0), nil
-	case time.Duration:
-		return complex(float64(v), 0), nil
 	case nil:
 		return complex(0, 0), nil
 	default:
@@ -1934,6 +1934,10 @@ func ToBoolE(a any) (bool, error) {
 		return real(v) != 0 || imag(v) != 0, nil
 	case bool:
 		return v, nil
+	case time.Time:
+		return !v.IsZero(), nil
+	case time.Duration:
+		return v != 0, nil
 	case string:
 		n, err := strconv.ParseBool(v)
 		if err == nil {
@@ -1958,10 +1962,6 @@ func ToBoolE(a any) (bool, error) {
 			return n, nil
 		}
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", a, a)
-	case time.Time:
-		return !v.IsZero(), nil
-	case time.Duration:
-		return v != 0, nil
 	case nil:
 		return false, nil
 	default:
@@ -2022,6 +2022,10 @@ func ToStringE(a any) (string, error) {
 		return fmt.Sprintf("(%v+%vi)", real(v), imag(v)), nil
 	case bool:
 		return strconv.FormatBool(v), nil
+	case time.Time:
+		return v.String(), nil
+	case time.Duration:
+		return v.String(), nil
 	case string:
 		return v, nil
 	case []byte:
@@ -2030,10 +2034,6 @@ func ToStringE(a any) (string, error) {
 		return v.String(), nil
 	case error:
 		return v.Error(), nil
-	case time.Time:
-		return v.String(), nil
-	case time.Duration:
-		return v.String(), nil
 	case nil:
 		return "", nil
 	default:
@@ -2094,6 +2094,10 @@ func ToBytesE(a any) ([]byte, error) {
 		return []byte(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
 	case bool:
 		return []byte(strconv.FormatBool(v)), nil
+	case time.Time:
+		return []byte(v.String()), nil
+	case time.Duration:
+		return []byte(v.String()), nil
 	case string:
 		return []byte(v), nil
 	case []byte:
@@ -2102,10 +2106,6 @@ func ToBytesE(a any) ([]byte, error) {
 		return []byte(v.String()), nil
 	case error:
 		return []byte(v.Error()), nil
-	case time.Time:
-		return []byte(v.String()), nil
-	case time.Duration:
-		return []byte(v.String()), nil
 	case nil:
 		return []byte{}, nil
 	default:
@@ -2166,6 +2166,10 @@ func ToStringerE(a any) (fmt.Stringer, error) {
 		return stringer{fmt.Sprintf("(%v+%vi)", real(v), imag(v))}, nil
 	case bool:
 		return stringer{strconv.FormatBool(v)}, nil
+	case time.Time:
+		return stringer{v.String()}, nil
+	case time.Duration:
+		return stringer{v.String()}, nil
 	case string:
 		return stringer{v}, nil
 	case []byte:
@@ -2174,10 +2178,6 @@ func ToStringerE(a any) (fmt.Stringer, error) {
 		return v, nil
 	case error:
 		return stringer{v.Error()}, nil
-	case time.Time:
-		return stringer{v.String()}, nil
-	case time.Duration:
-		return stringer{v.String()}, nil
 	case nil:
 		return stringer{""}, nil
 	default:
@@ -2238,6 +2238,10 @@ func ToErrorE(a any) (error, error) {
 		return errors.New(fmt.Sprintf("(%v+%vi)", real(v), imag(v))), nil
 	case bool:
 		return errors.New(strconv.FormatBool(v)), nil
+	case time.Time:
+		return errors.New(v.String()), nil
+	case time.Duration:
+		return errors.New(v.String()), nil
 	case string:
 		return errors.New(v), nil
 	case []byte:
@@ -2246,10 +2250,6 @@ func ToErrorE(a any) (error, error) {
 		return errors.New(v.String()), nil
 	case error:
 		return v, nil
-	case time.Time:
-		return errors.New(v.String()), nil
-	case time.Duration:
-		return errors.New(v.String()), nil
 	case nil:
 		return nil, nil
 	default:
@@ -2309,16 +2309,16 @@ func ToTimeE(a any) (time.Time, error) {
 			return time.Unix(1, 0), nil
 		}
 		return time.Unix(0, 0), nil
+	case time.Time:
+		return v, nil
+	case time.Duration:
+		return time.Unix(0, int64(v)), nil
 	case string:
 		return parseTime(v)
 	case []byte:
 		return parseTime(string(v))
 	case fmt.Stringer:
 		return parseTime(v.String())
-	case time.Time:
-		return v, nil
-	case time.Duration:
-		return time.Unix(0, int64(v)), nil
 	case nil:
 		return time.Time{}, nil
 	default:
@@ -2378,6 +2378,10 @@ func ToDurationE(a any) (d time.Duration, err error) {
 			return time.Duration(1), nil
 		}
 		return time.Duration(0), nil
+	case time.Time:
+		return v.Sub(time.Time{}), nil
+	case time.Duration:
+		return v, nil
 	case string:
 		return parseDuration(v)
 	case []byte:
@@ -2386,10 +2390,6 @@ func ToDurationE(a any) (d time.Duration, err error) {
 		return parseDuration(v.String())
 	case error:
 		return parseDuration(v.Error())
-	case time.Time:
-		return v.Sub(time.Time{}), nil
-	case time.Duration:
-		return v, nil
 	default:
 		return time.Duration(0), fmt.Errorf("unable to cast %#v of type %T to Duration", a, a)
 	}
