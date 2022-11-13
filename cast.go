@@ -577,8 +577,14 @@ func ToUintE(a any) (uint, error) {
 		n, _ := v.Float64()
 		return uint(n), nil
 	case complex64:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint(real(v)), nil
 	case complex128:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint(real(v)), nil
 	case bool:
 		if v {
@@ -586,8 +592,14 @@ func ToUintE(a any) (uint, error) {
 		}
 		return 0, nil
 	case time.Time:
+		if v.UnixNano() < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint(v.UnixNano()), nil
 	case time.Duration:
+		if int64(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint(v), nil
 	case string:
 		n, err := parseInt(v)
@@ -715,8 +727,14 @@ func ToUint8E(a any) (uint8, error) {
 		n, _ := v.Float64()
 		return uint8(n), nil
 	case complex64:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint8(real(v)), nil
 	case complex128:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint8(real(v)), nil
 	case bool:
 		if v {
@@ -724,8 +742,14 @@ func ToUint8E(a any) (uint8, error) {
 		}
 		return 0, nil
 	case time.Time:
+		if v.UnixNano() < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint8(v.UnixNano()), nil
 	case time.Duration:
+		if v < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint8(v), nil
 	case string:
 		n, err := parseInt(v)
@@ -853,8 +877,14 @@ func ToUint16E(a any) (uint16, error) {
 		n, _ := v.Float64()
 		return uint16(n), nil
 	case complex64:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint16(real(v)), nil
 	case complex128:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint16(real(v)), nil
 	case bool:
 		if v {
@@ -862,8 +892,14 @@ func ToUint16E(a any) (uint16, error) {
 		}
 		return 0, nil
 	case time.Time:
+		if v.UnixNano() < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint16(v.UnixNano()), nil
 	case time.Duration:
+		if v < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint16(v), nil
 	case string:
 		n, err := parseInt(v)
@@ -991,8 +1027,14 @@ func ToUint32E(a any) (uint32, error) {
 		n, _ := v.Float64()
 		return uint32(n), nil
 	case complex64:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint32(real(v)), nil
 	case complex128:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint32(real(v)), nil
 	case bool:
 		if v {
@@ -1000,8 +1042,14 @@ func ToUint32E(a any) (uint32, error) {
 		}
 		return 0, nil
 	case time.Time:
+		if v.UnixNano() < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint32(v.UnixNano()), nil
 	case time.Duration:
+		if v < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint32(v), nil
 	case string:
 		n, err := parseInt(v)
@@ -1129,8 +1177,14 @@ func ToUint64E(a any) (uint64, error) {
 		n, _ := v.Float64()
 		return uint64(n), nil
 	case complex64:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint64(real(v)), nil
 	case complex128:
+		if real(v) < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint64(real(v)), nil
 	case bool:
 		if v {
@@ -1138,8 +1192,14 @@ func ToUint64E(a any) (uint64, error) {
 		}
 		return 0, nil
 	case time.Time:
+		if v.UnixNano() < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint64(v.UnixNano()), nil
 	case time.Duration:
+		if v < 0 {
+			return 0, fmt.Errorf("unable to cast %#v of type %T to negative value", v, v)
+		}
 		return uint64(v), nil
 	case string:
 		n, err := parseInt(v)
@@ -1618,17 +1678,17 @@ func ToBigRatE(a any) (*big.Rat, error) {
 		if math.IsInf(float64(v), 0) || math.IsNaN(float64(v)) {
 			return big.NewRat(0, 1), fmt.Errorf("unable to cast %#v of type %T to big.Rat", a, a)
 		}
-		return big.NewRat(int64(v), 1), nil
+		return big.NewRat(0, 1).SetFloat64(float64(v)), nil
 	case float64:
 		if math.IsInf(v, 0) || math.IsNaN(v) {
 			return big.NewRat(0, 1), fmt.Errorf("unable to cast %#v of type %T to big.Rat", a, a)
 		}
-		return big.NewRat(int64(v), 1), nil
+		return big.NewRat(0, 1).SetFloat64(v), nil
 	case *big.Int:
 		if v == nil {
 			return big.NewRat(0, 1), fmt.Errorf("unable to cast %#v of type %T to *big.Rat", a, a)
 		}
-		return big.NewRat(0, 1).SetInt(v), nil
+		return big.NewRat(0, 1).SetFloat64(float64(v.Int64())), nil
 	case *big.Float:
 		if v == nil {
 			return big.NewRat(0, 1), fmt.Errorf("unable to cast %#v of type %T to *big.Rat", a, a)
@@ -1641,9 +1701,9 @@ func ToBigRatE(a any) (*big.Rat, error) {
 		}
 		return v, nil
 	case complex64:
-		return big.NewRat(int64(real(v)), 1), nil
+		return big.NewRat(0, 1).SetFloat64(float64(real(v))), nil
 	case complex128:
-		return big.NewRat(int64(real(v)), 1), nil
+		return big.NewRat(0, 1).SetFloat64(real(v)), nil
 	case bool:
 		if v {
 			return big.NewRat(1, 1), nil
@@ -1813,7 +1873,9 @@ func ToComplex128E(a any) (complex128, error) {
 	case uint64:
 		return complex(float64(v), 0), nil
 	case float32:
-		return complex(float64(v), 0), nil
+		f := float64(v)
+		c := complex(f, 0)
+		return c, nil
 	case float64:
 		return complex(v, 0), nil
 	case *big.Int:
@@ -1939,27 +2001,43 @@ func ToBoolE(a any) (bool, error) {
 	case time.Duration:
 		return v != 0, nil
 	case string:
-		n, err := strconv.ParseBool(v)
+		n, err := parseInt(v)
 		if err == nil {
-			return n, nil
+			return n != 0, nil
+		}
+		t, err := strconv.ParseBool(v)
+		if err == nil {
+			return t, nil
 		}
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", a, a)
 	case []byte:
-		n, err := strconv.ParseBool(string(v))
+		n, err := parseInt(string(v))
 		if err == nil {
-			return n, nil
+			return n != 0, nil
+		}
+		t, err := strconv.ParseBool(string(v))
+		if err == nil {
+			return t, nil
 		}
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", a, a)
 	case fmt.Stringer:
-		n, err := strconv.ParseBool(v.String())
+		n, err := parseInt(v.String())
 		if err == nil {
-			return n, nil
+			return n != 0, nil
+		}
+		t, err := strconv.ParseBool(v.String())
+		if err == nil {
+			return t, nil
 		}
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", a, a)
 	case error:
-		n, err := strconv.ParseBool(v.Error())
+		n, err := parseInt(v.Error())
 		if err == nil {
-			return n, nil
+			return n != 0, nil
+		}
+		t, err := strconv.ParseBool(v.Error())
+		if err == nil {
+			return t, nil
 		}
 		return false, fmt.Errorf("unable to cast %#v of type %T to bool", a, a)
 	case nil:
@@ -2530,7 +2608,7 @@ var (
 		{time.StampNano, timeFormatTimeOnly},
 	}
 
-	location = time.Local
+	location = time.UTC
 )
 
 func parseTime(s string) (time.Time, error) {
