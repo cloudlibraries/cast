@@ -2618,18 +2618,10 @@ func parseTime(s string, args ...any) (d time.Time, e error) {
 	)
 	for _, arg := range args {
 		switch v := arg.(type) {
-		case time.Location:
-			location = &v
+		case *time.Location:
+			location = v
 		case TimeFormat:
 			timeFormats = append(timeFormats, v)
-		case *TimeFormat:
-			timeFormats = append(timeFormats, *v)
-		case []TimeFormat:
-			timeFormats = append(timeFormats, v...)
-		case []*TimeFormat:
-			for _, f := range v {
-				timeFormats = append(timeFormats, *f)
-			}
 		}
 	}
 
@@ -2695,8 +2687,6 @@ func parseDuration(s string, args ...any) (time.Duration, error) {
 		switch v := arg.(type) {
 		case time.Time:
 			t = v
-		case *time.Time:
-			t = *v
 		}
 	}
 
