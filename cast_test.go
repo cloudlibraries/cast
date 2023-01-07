@@ -19,7 +19,12 @@ type testStep struct {
 }
 
 type testValues struct {
-	zero, one, eight, eightnegative, eightpoint31, eightpoint31negative any
+	zero, one, eight, eightnegative, eightpoint31, eightpoint31negative, eightpoint31_32, eightpoint31negative_32 any
+}
+
+func isUint(a any) bool {
+	kind := reflect.TypeOf(a).Kind()
+	return kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64
 }
 
 type stringer struct{ string }
@@ -29,34 +34,10 @@ func (s stringer) String() string {
 }
 
 func createTestSteps(t testValues) []testStep {
-	kind := reflect.TypeOf(t.zero).Kind()
-	isUint := kind == reflect.Uint || kind == reflect.Uint8 || kind == reflect.Uint16 || kind == reflect.Uint32 || kind == reflect.Uint64
-
-	// Some precision is lost when converting from float64 to float32.
-	eightpoint31_32 := t.eightpoint31
-	eightpoint31negative_32 := t.eightpoint31negative
-	if _, ok := t.zero.(float64); ok {
-		eightpoint31_32 = float64(float32(t.eightpoint31.(float64)))
-		eightpoint31negative_32 = float64(float32(t.eightpoint31negative.(float64)))
-	}
-	if _, ok := t.zero.(complex128); ok {
-		eightpoint31_32 = complex128(complex64(t.eightpoint31.(complex128)))
-		eightpoint31negative_32 = complex128(complex64(t.eightpoint31negative.(complex128)))
-	}
-	if _, ok := t.zero.(*big.Float); ok {
-		f, _ := t.eightpoint31.(*big.Float).Float32()
-		eightpoint31_32 = new(big.Float).SetFloat64(float64(f))
-		f, _ = t.eightpoint31negative.(*big.Float).Float32()
-		eightpoint31negative_32 = new(big.Float).SetFloat64(float64(f))
-	}
-	if _, ok := t.zero.(*big.Rat); ok {
-		f, _ := t.eightpoint31.(*big.Rat).Float32()
-		eightpoint31_32 = new(big.Rat).SetFloat64(float64(f))
-		f, _ = t.eightpoint31negative.(*big.Rat).Float32()
-		eightpoint31negative_32 = new(big.Rat).SetFloat64(float64(f))
-	}
+	isUint := isUint(t.zero)
 
 	return []testStep{
+		// positive numbers
 		{int(8), t.eight, false},
 		{int8(8), t.eight, false},
 		{int16(8), t.eight, false},
@@ -67,7 +48,7 @@ func createTestSteps(t testValues) []testStep {
 		{uint16(8), t.eight, false},
 		{uint32(8), t.eight, false},
 		{uint64(8), t.eight, false},
-		{float32(8.31), eightpoint31_32, false},
+		{float32(8.31), t.eightpoint31_32, false},
 		{float64(8.31), t.eightpoint31, false},
 		{big.NewInt(8), t.eight, false},
 		{big.NewFloat(8.31), t.eightpoint31, false},
@@ -75,32 +56,34 @@ func createTestSteps(t testValues) []testStep {
 		{complex64(8 + 0i), t.eight, false},
 		{complex128(8 + 0i), t.eight, false},
 		{true, t.one, false},
-		{false, t.zero, false},
+		{time.Unix(0, 8), t.eight, false},
+		{time.Duration(8), t.eight, false},
 		{"8", t.eight, false},
 		{[]byte{56}, t.eight, false},
 		{stringer{"8"}, t.eight, false},
 		{errors.New("8"), t.eight, false},
-		{time.Unix(0, 8), t.eight, false},
-		{time.Duration(8), t.eight, false},
 		{nil, t.zero, false},
+		// negative numbers
 		{int(-8), t.eightnegative, isUint},
 		{int8(-8), t.eightnegative, isUint},
 		{int16(-8), t.eightnegative, isUint},
 		{int32(-8), t.eightnegative, isUint},
 		{int64(-8), t.eightnegative, isUint},
-		{float32(-8.31), eightpoint31negative_32, isUint},
+		{float32(-8.31), t.eightpoint31negative_32, isUint},
 		{float64(-8.31), t.eightpoint31negative, isUint},
 		{big.NewInt(-8), t.eightnegative, isUint},
 		{big.NewFloat(-8.31), t.eightpoint31negative, isUint},
 		{big.NewRat(-8, 1), t.eightnegative, isUint},
 		{complex64(-8 + 0i), t.eightnegative, isUint},
 		{complex128(-8 + 0i), t.eightnegative, isUint},
+		{false, t.zero, false},
+		{time.Unix(0, -8), t.eightnegative, isUint},
+		{time.Duration(-8), t.eightnegative, isUint},
 		{"-8", t.eightnegative, isUint},
 		{[]byte{45, 56}, t.eightnegative, isUint},
 		{stringer{"-8"}, t.eightnegative, isUint},
 		{errors.New("-8"), t.eightnegative, isUint},
-		{time.Unix(0, -8), t.eightnegative, isUint},
-		{time.Duration(-8), t.eightnegative, isUint},
+		// unexpected value or types
 		{"test", t.zero, true},
 		{testing.T{}, t.zero, true},
 	}
@@ -122,6 +105,7 @@ func runTest(c *C, tests []testStep, tove func(any) (any, error), tov func(any) 
 		if t.Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()) {
 			c.Assert(v.(fmt.Stringer).String(), Equals, test.expect.(fmt.Stringer).String(), errmsg)
 		} else {
+			fmt.Println(v, test.expect)
 			c.Assert(v, Equals, test.expect, errmsg)
 		}
 
@@ -144,6 +128,8 @@ func TestToIntE(t *testing.T) {
 		int(-8),
 		int(8),
 		int(-8),
+		int(8),
+		int(-8),
 	})
 
 	runTest(
@@ -158,6 +144,8 @@ func TestToInt8E(t *testing.T) {
 	tests := createTestSteps(testValues{
 		int8(0),
 		int8(1),
+		int8(8),
+		int8(-8),
 		int8(8),
 		int8(-8),
 		int8(8),
@@ -180,6 +168,8 @@ func TestToInt16E(t *testing.T) {
 		int16(-8),
 		int16(8),
 		int16(-8),
+		int16(8),
+		int16(-8),
 	})
 
 	runTest(
@@ -194,6 +184,8 @@ func TestToInt32E(t *testing.T) {
 	tests := createTestSteps(testValues{
 		int32(0),
 		int32(1),
+		int32(8),
+		int32(-8),
 		int32(8),
 		int32(-8),
 		int32(8),
@@ -216,6 +208,8 @@ func TestToInt64E(t *testing.T) {
 		int64(-8),
 		int64(8),
 		int64(-8),
+		int64(8),
+		int64(-8),
 	})
 
 	runTest(
@@ -232,6 +226,8 @@ func TestToUintE(t *testing.T) {
 		uint(1),
 		uint(8),
 		uint(0),
+		uint(8),
+		uint(8),
 		uint(8),
 		uint(8),
 	})
@@ -252,6 +248,8 @@ func TestToUint8E(t *testing.T) {
 		uint8(0),
 		uint8(8),
 		uint8(8),
+		uint8(8),
+		uint8(8),
 	})
 
 	runTest(
@@ -268,6 +266,8 @@ func TestToUint16E(t *testing.T) {
 		uint16(1),
 		uint16(8),
 		uint16(0),
+		uint16(8),
+		uint16(8),
 		uint16(8),
 		uint16(8),
 	})
@@ -288,6 +288,8 @@ func TestToUint32E(t *testing.T) {
 		uint32(0),
 		uint32(8),
 		uint32(8),
+		uint32(8),
+		uint32(8),
 	})
 
 	runTest(
@@ -301,9 +303,11 @@ func TestToUint32E(t *testing.T) {
 func TestToUint64E(t *testing.T) {
 	tests := createTestSteps(testValues{
 		uint64(0),
-		int64(1),
+		uint64(1),
 		uint64(8),
 		uint64(0),
+		uint64(8),
+		uint64(8),
 		uint64(8),
 		uint64(8),
 	})
@@ -324,6 +328,8 @@ func TestToFloat32E(t *testing.T) {
 		float32(-8),
 		float32(8.31),
 		float32(-8.31),
+		float32(8.31),
+		float32(-8.31),
 	})
 
 	runTest(
@@ -342,6 +348,8 @@ func TestToFloat64E(t *testing.T) {
 		float64(-8),
 		float64(8.31),
 		float64(-8.31),
+		float64(float32(float64(8.31))),
+		float64(float32(float64(-8.31))),
 	})
 
 	runTest(
@@ -360,6 +368,8 @@ func TestToBigIntE(t *testing.T) {
 		big.NewInt(-8),
 		big.NewInt(8),
 		big.NewInt(-8),
+		big.NewInt(8),
+		big.NewInt(-8),
 	})
 
 	runTest(
@@ -371,6 +381,10 @@ func TestToBigIntE(t *testing.T) {
 }
 
 func TestToBigFloatE(t *testing.T) {
+	f, _ := big.NewFloat(8.31).Float32()
+	eightpoint31_32 := new(big.Float).SetFloat64(float64(f))
+	f, _ = big.NewFloat(-8.31).Float32()
+	eightpoint31negative_32 := new(big.Float).SetFloat64(float64(f))
 	tests := createTestSteps(testValues{
 		big.NewFloat(0),
 		big.NewFloat(1),
@@ -378,6 +392,8 @@ func TestToBigFloatE(t *testing.T) {
 		big.NewFloat(-8),
 		big.NewFloat(8.31),
 		big.NewFloat(-8.31),
+		eightpoint31_32,
+		eightpoint31negative_32,
 	})
 
 	runTest(
@@ -389,6 +405,10 @@ func TestToBigFloatE(t *testing.T) {
 }
 
 func TestToBigRatE(t *testing.T) {
+	f, _ := big.NewRat(0, 1).SetFloat64(8.31).Float32()
+	eightpoint31_32 := new(big.Rat).SetFloat64(float64(f))
+	f, _ = big.NewRat(0, 1).SetFloat64(-8.31).Float32()
+	eightpoint31negative_32 := new(big.Rat).SetFloat64(float64(f))
 	tests := createTestSteps(testValues{
 		big.NewRat(0, 1),
 		big.NewRat(1, 1),
@@ -396,6 +416,8 @@ func TestToBigRatE(t *testing.T) {
 		big.NewRat(-8, 1),
 		big.NewRat(0, 1).SetFloat64(8.31),
 		big.NewRat(0, 1).SetFloat64(-8.31),
+		eightpoint31_32,
+		eightpoint31negative_32,
 	})
 
 	runTest(
@@ -412,6 +434,8 @@ func TestToComplex64(t *testing.T) {
 		complex64(1 + 0i),
 		complex64(8 + 0i),
 		complex64(-8 + 0i),
+		complex64(8.31 + 0i),
+		complex64(-8.31 + 0i),
 		complex64(8.31 + 0i),
 		complex64(-8.31 + 0i),
 	})
@@ -432,6 +456,8 @@ func TestToComplex128(t *testing.T) {
 		complex128(-8 + 0i),
 		complex128(8.31 + 0i),
 		complex128(-8.31 + 0i),
+		complex128(complex64(complex128(8.31 + 0i))),
+		complex128(complex64(complex128(-8.31 + 0i))),
 	})
 
 	runTest(
@@ -445,6 +471,8 @@ func TestToComplex128(t *testing.T) {
 func TestToBoolE(t *testing.T) {
 	tests := createTestSteps(testValues{
 		false,
+		true,
+		true,
 		true,
 		true,
 		true,
@@ -523,6 +551,42 @@ func TestToTimeE(t *testing.T) {
 		v = cast.ToTime(test.input)
 		c.Assert(v.UTC(), Equals, test.expect, errmsg)
 	}
+}
+
+func TestToDurationE(t *testing.T) {
+	t.Error("Not implemented")
+}
+
+func TestToStringE(t *testing.T) {
+	tests := createTestSteps(testValues{
+		"0",
+		"1",
+		"8",
+		"-8",
+		"8.31",
+		"-8.31",
+		"8.31",
+		"-8.31",
+	})
+
+	runTest(
+		New(t),
+		tests,
+		func(v any) (any, error) { return cast.ToStringE(v) },
+		func(v any) any { return cast.ToString(v) },
+	)
+}
+
+func TestToBytesE(t *testing.T) {
+	t.Error("Not implemented")
+}
+
+func TestToStringerE(t *testing.T) {
+	t.Error("Not implemented")
+}
+
+func TestToErrorE(t *testing.T) {
+	t.Error("Not implemented")
 }
 
 // func TestToStringE(t *testing.T) {
