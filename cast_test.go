@@ -557,18 +557,63 @@ func TestToDurationE(t *testing.T) {
 	t.Error("Not implemented")
 }
 
-func TestToStringE(t *testing.T) {
-	tests := createTestSteps(testValues{
-		"0",
-		"1",
-		"8",
-		"-8",
-		"8.31",
-		"-8.31",
-		"8.31",
-		"-8.31",
-	})
+func createStringTestSteps() []testStep {
+	isUint := false
+	t := testValues{"0", "1", "8", "-8", "8.31", "-8.31", "8.31", "-8.31"}
+	return []testStep{ // positive numbers
+		{int(8), t.eight, false},
+		{int8(8), t.eight, false},
+		{int16(8), t.eight, false},
+		{int32(8), t.eight, false},
+		{int64(8), t.eight, false},
+		{uint(8), t.eight, false},
+		{uint8(8), t.eight, false},
+		{uint16(8), t.eight, false},
+		{uint32(8), t.eight, false},
+		{uint64(8), t.eight, false},
+		{float32(8.31), t.eightpoint31_32, false},
+		{float64(8.31), t.eightpoint31, false},
+		{big.NewInt(8), t.eight, false},
+		{big.NewFloat(8.31), t.eightpoint31, false},
+		{big.NewRat(8, 1), "8/1", false},      // special case
+		{complex64(8 + 0i), "(8+0i)", false},  // special case
+		{complex128(8 + 0i), "(8+0i)", false}, // special case
+		{true, "true", false},                 // special case
+		{time.Unix(0, 8), t.eight, false},
+		{time.Duration(8), t.eight, false},
+		{"8", t.eight, false},
+		{[]byte{56}, t.eight, false},
+		{stringer{"8"}, t.eight, false},
+		{errors.New("8"), t.eight, false},
+		{nil, "nil", false},
+		// negative numbers
+		{int(-8), t.eightnegative, isUint},
+		{int8(-8), t.eightnegative, isUint},
+		{int16(-8), t.eightnegative, isUint},
+		{int32(-8), t.eightnegative, isUint},
+		{int64(-8), t.eightnegative, isUint},
+		{float32(-8.31), t.eightpoint31negative_32, isUint},
+		{float64(-8.31), t.eightpoint31negative, isUint},
+		{big.NewInt(-8), t.eightnegative, isUint},
+		{big.NewFloat(-8.31), t.eightpoint31negative, isUint},
+		{big.NewRat(-8, 1), "-8/1", isUint},      // special case
+		{complex64(-8 + 0i), (-8 + 0i), isUint},  // special case
+		{complex128(-8 + 0i), (-8 + 0i), isUint}, // special case
+		{false, "false", false},                  // special case
+		{time.Unix(0, -8), t.eightnegative, isUint},
+		{time.Duration(-8), t.eightnegative, isUint},
+		{"-8", t.eightnegative, isUint},
+		{[]byte{45, 56}, t.eightnegative, isUint},
+		{stringer{"-8"}, t.eightnegative, isUint},
+		{errors.New("-8"), t.eightnegative, isUint},
+		// unexpected value or types
+		{"test", t.zero, true},
+		{testing.T{}, t.zero, true},
+	}
+}
 
+func TestToStringE(t *testing.T) {
+	tests := createStringTestSteps()
 	runTest(
 		New(t),
 		tests,
