@@ -1710,27 +1710,27 @@ func ToComplex64E(a any) (complex64, error) {
 		}
 		return complex(0, 0), nil
 	case string:
-		n, err := strconv.ParseFloat(v, 32)
+		n, err := strconv.ParseComplex(v, 64)
 		if err == nil {
-			return complex(float32(n), 0), nil
+			return complex64(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex64", a, a)
 	case []byte:
-		n, err := strconv.ParseFloat(string(v), 32)
+		n, err := strconv.ParseComplex(string(v), 64)
 		if err == nil {
-			return complex(float32(n), 0), nil
+			return complex64(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex64", a, a)
 	case fmt.Stringer:
-		n, err := strconv.ParseFloat(v.String(), 32)
+		n, err := strconv.ParseComplex(v.String(), 64)
 		if err == nil {
-			return complex(float32(n), 0), nil
+			return complex64(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex64", a, a)
 	case error:
-		n, err := strconv.ParseFloat(v.Error(), 32)
+		n, err := strconv.ParseComplex(v.Error(), 64)
 		if err == nil {
-			return complex(float32(n), 0), nil
+			return complex64(n), nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex64", a, a)
 	case nil:
@@ -1805,27 +1805,27 @@ func ToComplex128E(a any) (complex128, error) {
 		}
 		return complex(0, 0), nil
 	case string:
-		n, err := strconv.ParseFloat(v, 64)
+		n, err := strconv.ParseComplex(v, 128)
 		if err == nil {
-			return complex(n, 0), nil
+			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex128", a, a)
 	case []byte:
-		n, err := strconv.ParseFloat(string(v), 64)
+		n, err := strconv.ParseComplex(string(v), 128)
 		if err == nil {
-			return complex(n, 0), nil
+			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex128", a, a)
 	case fmt.Stringer:
-		n, err := strconv.ParseFloat(v.String(), 64)
+		n, err := strconv.ParseComplex(v.String(), 128)
 		if err == nil {
-			return complex(n, 0), nil
+			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex128", a, a)
 	case error:
-		n, err := strconv.ParseFloat(v.Error(), 64)
+		n, err := strconv.ParseComplex(v.Error(), 128)
 		if err == nil {
-			return complex(n, 0), nil
+			return n, nil
 		}
 		return 0, fmt.Errorf("unable to cast %#v of type %T to complex128", a, a)
 	case nil:
